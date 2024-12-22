@@ -79,7 +79,14 @@ export const sendMessage = async (threadId: string, content: string, image?: str
 
     // Get the assistant's response
     const messages = await openai.beta.threads.messages.list(threadId);
-    return messages.data[0].content[0];
+    const lastMessage = messages.data[0].content[0];
+    
+    // Extract text content from the response
+    if (lastMessage.type === 'text') {
+      return { text: lastMessage.text.value };
+    } else {
+      return { text: 'I received your image but can only respond with text messages.' };
+    }
   } catch (error) {
     console.error('Error sending message:', error);
     throw error;
