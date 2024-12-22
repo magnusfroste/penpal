@@ -73,14 +73,16 @@ export const sendMessage = async (threadId: string, content: string, image?: str
         ASSISTANT_ID,
         {
           tools: [{ type: "code_interpreter" }],
-          file_ids: [uploadedFile.id]
-        } as any // Temporary type assertion to bypass TypeScript error
+          fileIds: [uploadedFile.id]
+        }
       );
 
       // Add the image to the message content
       messageContent.push({
         type: 'image_file',
-        file_id: uploadedFile.id
+        image_file: {
+          file_id: uploadedFile.id
+        }
       });
     }
 
