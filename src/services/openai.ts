@@ -63,7 +63,7 @@ export const sendMessage = async (threadId: string, content: string, image?: str
 
       const uploadedFile = await openai.files.create({
         file,
-        purpose: 'assistants',
+        purpose: "assistants"
       });
 
       console.log('File uploaded successfully:', uploadedFile.id);
@@ -73,8 +73,8 @@ export const sendMessage = async (threadId: string, content: string, image?: str
         ASSISTANT_ID,
         {
           tools: [{ type: "code_interpreter" }],
-          fileIds: [uploadedFile.id]
-        }
+          file_ids: [uploadedFile.id]
+        } as any // Type assertion needed until OpenAI types are updated
       );
 
       // Add the image to the message content
