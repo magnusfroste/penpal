@@ -90,7 +90,7 @@ export const sendMessage = async (threadId: string, content: string, image?: str
     console.log('Starting assistant run...');
     const run = await openai.beta.threads.runs.create(threadId, {
       assistant_id: ASSISTANT_ID,
-      instructions: "Please analyze the handwriting sample and provide your analysis in JSON format. Include strengths, improvements, and tips in your JSON response."
+      instructions: "Please analyze the handwriting sample and provide your analysis. Include strengths, areas for improvement, and practical tips."
     });
 
     let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
