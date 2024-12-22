@@ -90,34 +90,7 @@ export const sendMessage = async (threadId: string, content: string, image?: str
     console.log('Starting assistant run...');
     const run = await openai.beta.threads.runs.create(threadId, {
       assistant_id: ASSISTANT_ID,
-      instructions: `Du är en erfaren lärare som hjälper en 8-årig elev med handstilen. 
-      När du analyserar handstilen, dela upp din analys i tre tydliga delar:
-      
-      1. Styrkor - Berätta vad eleven gör bra (t.ex. bokstävernas storlek, mellanrum mellan ord, lutning, skrivhastighet, penngrepp etc.)
-      2. Förbättringsområden - Förklara vänligt vad som kan bli bättre. Använd uppmuntrande ord och fokusera på max 2-3 saker att förbättra.
-      3. Tips och övningar - Ge 2-3 specifika och roliga övningar. Gör dem lekfulla, som att "rita bokstaven som en orm som slingrar sig" eller "skriv bokstaven som en superhjälte som flyger".
-      
-      Viktigt att tänka på:
-      - Börja alltid med att berömma något positivt
-      - Använd ett enkelt och lekfullt språk som ett barn förstår
-      - Var entusiastisk och uppmuntrande i din ton
-      - Jämför gärna med roliga saker som barn känner till
-      - Ge konkreta exempel på hur förbättringarna kan göras
-      
-      Formatera svaret så här:
-      STYRKOR:
-      - [styrka 1]
-      - [styrka 2]
-      
-      FÖRBÄTTRINGSOMRÅDEN:
-      - [förbättring 1]
-      - [förbättring 2]
-      
-      TIPS OCH ÖVNINGAR:
-      - [tips 1]
-      - [tips 2]
-      
-      Efter analysen, fråga om eleven vill ha ett roligt PDF-dokument med bokstäver att öva på, anpassat efter deras behov.`
+      instructions: "Du är en erfaren lärare som hjälper en 8-årig elev med handstilen. Var pedagogisk, uppmuntrande och rolig! Efter analysen, fråga om eleven vill ha ett PDF-dokument med bokstäver att öva på."
     });
 
     let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
@@ -137,45 +110,10 @@ export const sendMessage = async (threadId: string, content: string, image?: str
     
     if (lastMessage.type === 'text') {
       console.log('Response received successfully');
-      const text = lastMessage.text.value;
-      
-      // Parse the response into sections
-      const analysis = {
-        strengths: [] as string[],
-        improvements: [] as string[],
-        tips: [] as string[]
-      };
-      
-      let currentSection = '';
-      const lines = text.split('\n');
-      
-      for (const line of lines) {
-        const trimmedLine = line.trim();
-        if (trimmedLine.startsWith('STYRKOR:')) {
-          currentSection = 'strengths';
-        } else if (trimmedLine.startsWith('FÖRBÄTTRINGSOMRÅDEN:')) {
-          currentSection = 'improvements';
-        } else if (trimmedLine.startsWith('TIPS OCH ÖVNINGAR:')) {
-          currentSection = 'tips';
-        } else if (trimmedLine.startsWith('-') && currentSection) {
-          analysis[currentSection].push(trimmedLine.substring(1).trim());
-        }
-      }
-      
-      return { 
-        text,
-        analysis
-      };
+      return { text: lastMessage.text.value };
     } else {
       console.log('Non-text response received');
-      return { 
-        text: 'Jag tog emot din bild men kan bara svara med text.',
-        analysis: {
-          strengths: [],
-          improvements: [],
-          tips: []
-        }
-      };
+      return { text: 'Jag tog emot din bild men kan bara svara med text.' };
     }
   } catch (error) {
     console.error('Error in sendMessage:', error);
