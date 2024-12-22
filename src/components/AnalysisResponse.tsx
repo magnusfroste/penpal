@@ -1,11 +1,13 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
-import { Check, Info, AlertTriangle, Loader2 } from "lucide-react";
+import { Check, Info, AlertTriangle, Loader2, Star, PenTool } from "lucide-react";
 
 interface Analysis {
   strengths: string[];
   improvements: string[];
   tips: string[];
+  perfectLetters: string[];
+  practiceLetters: string[];
 }
 
 interface AnalysisResponseProps {
@@ -31,8 +33,16 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
   const analysis = message.analysis || {
     strengths: [],
     improvements: [],
-    tips: []
+    tips: [],
+    perfectLetters: [],
+    practiceLetters: []
   };
+
+  const LetterBadge = ({ letter }: { letter: string }) => (
+    <span className="inline-block px-3 py-1 m-1 text-lg font-medium rounded-full bg-background border-2">
+      {letter}
+    </span>
+  );
 
   return (
     <div className="w-full space-y-6">
@@ -83,6 +93,32 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
               ))}
             </ul>
           </Card>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <Card className="p-4 bg-gradient-to-r from-blue-50 to-blue-100">
+              <h3 className="text-lg font-semibold flex items-center gap-2 text-blue-700 mb-3">
+                <Star className="h-5 w-5" />
+                Bokstäver som ser bra ut
+              </h3>
+              <div className="flex flex-wrap">
+                {analysis.perfectLetters.map((letter, index) => (
+                  <LetterBadge key={index} letter={letter} />
+                ))}
+              </div>
+            </Card>
+
+            <Card className="p-4 bg-gradient-to-r from-purple-50 to-purple-100">
+              <h3 className="text-lg font-semibold flex items-center gap-2 text-purple-700 mb-3">
+                <PenTool className="h-5 w-5" />
+                Bokstäver att öva på
+              </h3>
+              <div className="flex flex-wrap">
+                {analysis.practiceLetters.map((letter, index) => (
+                  <LetterBadge key={index} letter={letter} />
+                ))}
+              </div>
+            </Card>
+          </div>
 
           <div>
             <h3 className="text-lg font-semibold flex items-center gap-2 text-blue-700 mb-3">

@@ -31,8 +31,11 @@ export const sendMessage = async (threadId: string, content: string, image?: str
         {
           "strengths": ["styrka1", "styrka2", ...],
           "improvements": ["förbättring1", "förbättring2", ...],
-          "tips": ["tips1", "tips2", ...]
+          "tips": ["tips1", "tips2", ...],
+          "perfectLetters": ["a", "b", "m", ...],
+          "practiceLetters": ["d", "g", "p", ...]
         }
+        Analysera specifika bokstäver och kategorisera dem i perfectLetters (välformade bokstäver) och practiceLetters (bokstäver som behöver övas på).
         Håll varje punkt kortfattad och barnanpassad. Svara ENDAST med JSON, inga extra kommentarer.`
       }
     ];
@@ -75,7 +78,9 @@ export const sendMessage = async (threadId: string, content: string, image?: str
         analysis: {
           strengths: parsedResponse.strengths || [],
           improvements: parsedResponse.improvements || [],
-          tips: parsedResponse.tips || []
+          tips: parsedResponse.tips || [],
+          perfectLetters: parsedResponse.perfectLetters || [],
+          practiceLetters: parsedResponse.practiceLetters || []
         }
       };
     } catch (error) {
@@ -85,7 +90,9 @@ export const sendMessage = async (threadId: string, content: string, image?: str
         analysis: {
           strengths: ['Din handstil visar potential!'],
           improvements: ['Vi kunde inte analysera bilden ordentligt'],
-          tips: ['Försök ta ett tydligare foto med bra belysning']
+          tips: ['Försök ta ett tydligare foto med bra belysning'],
+          perfectLetters: [],
+          practiceLetters: []
         }
       };
     }
