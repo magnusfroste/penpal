@@ -28,7 +28,10 @@ const getOpenAIKey = async () => {
       throw new Error('No API key found. Please check if OPENAI_API_KEY is set in Supabase secrets.');
     }
 
-    const secretValue = data.value;
+    // Cast the response to the correct type
+    const response = data as SecretResponse;
+    const secretValue = response.value;
+    
     console.log('Secret value type:', typeof secretValue);
     console.log('Secret value exists:', !!secretValue);
 
