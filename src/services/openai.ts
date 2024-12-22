@@ -1,10 +1,21 @@
 import OpenAI from 'openai';
+import { supabase } from '@/integrations/supabase/client';
+
+const getOpenAIKey = async () => {
+  const { data, error } = await supabase.rpc('get_secret', {
+    secret_name: 'OPENAI_API_KEY'
+  });
+  
+  if (error) throw error;
+  return data.value;
+};
 
 const ASSISTANT_ID = 'asst_OBHVa19qPFsuQpBwX9ai6daM';
 
 export const createThread = async () => {
+  const apiKey = await getOpenAIKey();
   const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey,
     dangerouslyAllowBrowser: true
   });
 
@@ -18,8 +29,9 @@ export const createThread = async () => {
 };
 
 export const sendMessage = async (threadId: string, content: string, image?: string) => {
+  const apiKey = await getOpenAIKey();
   const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey,
     dangerouslyAllowBrowser: true
   });
 
