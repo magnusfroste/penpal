@@ -45,11 +45,10 @@ export const sendMessage = async (threadId: string, content: string, image?: str
     let messageContent: any[] = [
       {
         type: 'text',
-        text: content
+        text: content + "\n\nPlease provide your analysis in JSON format with the following structure:\n{\n  strengths: string[],\n  improvements: string[],\n  tips: string[]\n}"
       }
     ];
 
-    // If there's an image, upload it and attach it to the message
     if (image) {
       console.log('Processing image upload...');
       const base64Data = image.split(',')[1];
@@ -68,16 +67,14 @@ export const sendMessage = async (threadId: string, content: string, image?: str
 
       console.log('File uploaded successfully:', uploadedFile.id);
       
-      // Update the assistant with the new file
       await openai.beta.assistants.update(
         ASSISTANT_ID,
         {
           tools: [{ type: "code_interpreter" }],
           file_ids: [uploadedFile.id]
-        } as any // Type assertion needed until OpenAI types are updated
+        } as any
       );
 
-      // Add the image to the message content
       messageContent.push({
         type: 'image_file',
         image_file: {
@@ -86,7 +83,6 @@ export const sendMessage = async (threadId: string, content: string, image?: str
       });
     }
 
-    // Create the message with all content
     await openai.beta.threads.messages.create(threadId, {
       role: 'user',
       content: messageContent
@@ -114,6 +110,16 @@ export const sendMessage = async (threadId: string, content: string, image?: str
     
     if (lastMessage.type === 'text') {
       console.log('Response received successfully');
+      try {
+        // Try to parse the response as JSON
+        const jsonMatch = lastMessage.text.value.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const jsonResponse = JSON.parse(jsonMatch[0]);
+          return { text: lastMessage.text.value, analysis: jsonResponse };
+        }
+      } catch (error) {
+        console.log('Failed to parse JSON response:', error);
+      }
       return { text: lastMessage.text.value };
     } else {
       console.log('Non-text response received');

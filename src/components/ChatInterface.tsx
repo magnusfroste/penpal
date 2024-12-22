@@ -5,6 +5,11 @@ interface Message {
   role: string;
   content: string;
   image?: string;
+  analysis?: {
+    strengths: string[];
+    improvements: string[];
+    tips: string[];
+  };
 }
 
 interface ChatInterfaceProps {
@@ -12,8 +17,18 @@ interface ChatInterfaceProps {
 }
 
 export const ChatInterface = ({ messages }: ChatInterfaceProps) => {
-  const lastAssistantMessage = messages.findLast(m => m.role === 'assistant');
-  const userMessage = messages.findLast(m => m.role === 'user');
+  // Polyfill for findLast
+  const findLast = <T,>(array: T[], predicate: (value: T) => boolean): T | undefined => {
+    for (let i = array.length - 1; i >= 0; i--) {
+      if (predicate(array[i])) {
+        return array[i];
+      }
+    }
+    return undefined;
+  };
+
+  const lastAssistantMessage = findLast(messages, m => m.role === 'assistant');
+  const userMessage = findLast(messages, m => m.role === 'user');
 
   if (!messages.length) {
     return null;
