@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Check, Info, AlertTriangle, Loader2, Star, PenTool } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 interface Analysis {
   strengths: string[];
