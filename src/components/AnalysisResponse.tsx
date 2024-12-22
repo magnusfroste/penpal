@@ -46,18 +46,6 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
 
   return (
     <div className="w-full space-y-6">
-      {/* Image is now always shown, regardless of thinking state */}
-      {message.image && (
-        <Card className="p-4">
-          <h3 className="text-lg font-semibold mb-2">Din handstil</h3>
-          <img
-            src={message.image}
-            alt="Handskriftsprov"
-            className="rounded-lg shadow-lg mx-auto max-h-[300px] object-contain"
-          />
-        </Card>
-      )}
-      
       {isThinking ? (
         <div className="flex flex-col items-center justify-center p-12 space-y-4">
           <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -108,17 +96,30 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
               </div>
             </Card>
 
-            <Card className="p-4 bg-gradient-to-r from-purple-50 to-purple-100">
-              <h3 className="text-lg font-semibold flex items-center gap-2 text-purple-700 mb-3">
-                <PenTool className="h-5 w-5" />
-                Bokstäver att öva på
-              </h3>
-              <div className="flex flex-wrap">
-                {analysis.practiceLetters.map((letter, index) => (
-                  <LetterBadge key={index} letter={letter} />
-                ))}
-              </div>
-            </Card>
+            <div className="space-y-4">
+              <Card className="p-4 bg-gradient-to-r from-purple-50 to-purple-100">
+                <h3 className="text-lg font-semibold flex items-center gap-2 text-purple-700 mb-3">
+                  <PenTool className="h-5 w-5" />
+                  Bokstäver att öva på
+                </h3>
+                <div className="flex flex-wrap">
+                  {analysis.practiceLetters.map((letter, index) => (
+                    <LetterBadge key={index} letter={letter} />
+                  ))}
+                </div>
+              </Card>
+
+              {message.image && (
+                <Card className="p-4">
+                  <h3 className="text-lg font-semibold mb-2">Din handstil</h3>
+                  <img
+                    src={message.image}
+                    alt="Handskriftsprov"
+                    className="rounded-lg shadow-lg mx-auto max-h-[300px] object-contain"
+                  />
+                </Card>
+              )}
+            </div>
           </div>
 
           <div>
