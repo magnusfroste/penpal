@@ -48,7 +48,7 @@ export const sendMessage = async (threadId: string, content: string, image?: str
       content: content
     });
 
-    // If there's an image, upload it and attach it to the assistant
+    // If there's an image, upload it and attach it to the thread
     if (image) {
       console.log('Processing image upload...');
       const base64Data = image.split(',')[1];
@@ -67,11 +67,11 @@ export const sendMessage = async (threadId: string, content: string, image?: str
 
       console.log('File uploaded successfully:', uploadedFile.id);
       
-      // Create a new file attachment for the assistant
-      await openai.beta.assistants.files.create(
-        ASSISTANT_ID,
-        { file_id: uploadedFile.id }
-      );
+      // Add the file to the assistant using the correct API method
+      await openai.beta.assistants.addFile({
+        assistant_id: ASSISTANT_ID,
+        file_id: uploadedFile.id
+      });
     }
 
     console.log('Starting assistant run...');
