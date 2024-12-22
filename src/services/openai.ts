@@ -1,7 +1,5 @@
 import OpenAI from 'openai';
 
-const ASSISTANT_ID = 'asst_OBHVa19qPFsuQpBwX9ai6daM';
-
 const getOpenAIKey = () => {
   const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
   
@@ -13,107 +11,76 @@ const getOpenAIKey = () => {
 };
 
 export const createThread = async () => {
-  try {
-    console.log('Starting thread creation...');
-    const apiKey = getOpenAIKey();
-    
-    console.log('Initializing OpenAI client...');
-    const openai = new OpenAI({
-      apiKey,
-      dangerouslyAllowBrowser: true
-    });
-
-    console.log('Creating thread...');
-    const thread = await openai.beta.threads.create();
-    console.log('Thread created successfully:', thread.id);
-    return thread;
-  } catch (error) {
-    console.error('Error in createThread:', error);
-    throw error;
-  }
+  // We'll keep this simple since we don't need threads anymore
+  return { id: 'direct-completion' };
 };
 
 export const sendMessage = async (threadId: string, content: string, image?: string) => {
   try {
-    console.log('Starting to send message to thread:', threadId);
+    console.log('Starting to process message...');
     const apiKey = getOpenAIKey();
     const openai = new OpenAI({
       apiKey,
       dangerouslyAllowBrowser: true
     });
 
-    let messageContent: any[] = [
+    let messages: any[] = [
       {
-        type: 'text',
-        text: content
+        role: "system",
+        content: `You are a handwriting analysis expert helping an 8-year-old student improve their handwriting. 
+        Be pedagogical, encouraging, and fun! Analyze the handwriting and return your response in this exact JSON format:
+        {
+          "strengths": ["strength1", "strength2", ...],
+          "improvements": ["improvement1", "improvement2", ...],
+          "tips": ["tip1", "tip2", ...]
+        }
+        Keep each point concise and child-friendly.`
+      },
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: "Please analyze this handwriting sample:"
+          }
+        ]
       }
     ];
 
     if (image) {
-      console.log('Processing image upload...');
-      const base64Data = image.split(',')[1];
-      const binaryData = atob(base64Data);
-      const array = new Uint8Array(binaryData.length);
-      for (let i = 0; i < binaryData.length; i++) {
-        array[i] = binaryData.charCodeAt(i);
-      }
-      const blob = new Blob([array], { type: 'image/jpeg' });
-      const file = new File([blob], 'handwriting.jpg', { type: 'image/jpeg' });
-
-      const uploadedFile = await openai.files.create({
-        file,
-        purpose: "assistants"
-      });
-
-      console.log('File uploaded successfully:', uploadedFile.id);
-      
-      await openai.beta.assistants.update(
-        ASSISTANT_ID,
-        {
-          file_ids: [uploadedFile.id]
-        } as any
-      );
-
-      messageContent.push({
-        type: 'image_file',
-        image_file: {
-          file_id: uploadedFile.id
+      messages[1].content.push({
+        type: "image_url",
+        image_url: {
+          url: image
         }
       });
     }
 
-    await openai.beta.threads.messages.create(threadId, {
-      role: 'user',
-      content: messageContent
+    console.log('Sending request to GPT-4 Vision...');
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4-vision-preview",
+      messages: messages,
+      max_tokens: 1000,
     });
 
-    console.log('Starting assistant run...');
-    const run = await openai.beta.threads.runs.create(threadId, {
-      assistant_id: ASSISTANT_ID,
-      instructions: "Du är en erfaren lärare som hjälper en 8-årig elev med handstilen. Var pedagogisk, uppmuntrande och rolig! Efter analysen, fråga om eleven vill ha ett PDF-dokument med bokstäver att öva på."
-    });
+    const response = completion.choices[0].message.content;
+    console.log('Response received:', response);
 
-    let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
-    while (runStatus.status !== 'completed') {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
-      console.log('Current run status:', runStatus.status);
-      
-      if (runStatus.status === 'failed') {
-        console.error('Assistant run failed:', runStatus);
-        throw new Error('Assistant run failed');
-      }
-    }
-
-    const messages = await openai.beta.threads.messages.list(threadId);
-    const lastMessage = messages.data[0].content[0];
-    
-    if (lastMessage.type === 'text') {
-      console.log('Response received successfully');
-      return { text: lastMessage.text.value };
-    } else {
-      console.log('Non-text response received');
-      return { text: 'Jag tog emot din bild men kan bara svara med text.' };
+    try {
+      // Parse the JSON response
+      const parsedResponse = JSON.parse(response || '{}');
+      return {
+        text: response,
+        analysis: {
+          strengths: parsedResponse.strengths || [],
+          improvements: parsedResponse.improvements || [],
+          tips: parsedResponse.tips || []
+        }
+      };
+    } catch (error) {
+      console.error('Error parsing JSON response:', error);
+      // Fallback to text response if JSON parsing fails
+      return { text: response };
     }
   } catch (error) {
     console.error('Error in sendMessage:', error);
