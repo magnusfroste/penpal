@@ -8,7 +8,7 @@ interface HandwritingExerciseSheetProps {
 
 const HandwritingExerciseSheet = ({ practiceLetters, improvements, tips }: HandwritingExerciseSheetProps) => {
   return (
-    <div className="p-8 bg-white text-black">
+    <div className="p-8 bg-white text-black" style={{ width: '210mm', height: '297mm' }}>
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold mb-2">Mitt handstilsövningsblad</h1>
         <p className="text-sm">Datum: {new Date().toLocaleDateString('sv-SE')}</p>

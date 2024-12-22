@@ -1,9 +1,12 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
-import { Check, Info, AlertTriangle, Loader2, Star, PenTool, Printer } from "lucide-react";
+import { Check, Info, AlertTriangle, Loader2, Star, PenTool, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import HandwritingExerciseSheet from './HandwritingExerciseSheet';
 import { createRoot } from 'react-dom/client';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { useToast } from "@/hooks/use-toast";
 
 interface Analysis {
   strengths: string[];
@@ -24,6 +27,8 @@ interface AnalysisResponseProps {
 const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
   const [isThinking, setIsThinking] = React.useState(true);
   const [showImage, setShowImage] = React.useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = React.useState(false);
+  const { toast } = useToast();
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -47,32 +52,68 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
     </span>
   );
 
-  const handlePrint = () => {
-    const printContent = document.createElement('div');
-    printContent.style.position = 'fixed';
-    printContent.style.left = '-9999px';
-    document.body.appendChild(printContent);
+  const handleDownloadPDF = async () => {
+    try {
+      setIsGeneratingPDF(true);
+      
+      // Create a temporary container for the exercise sheet
+      const container = document.createElement('div');
+      container.style.position = 'fixed';
+      container.style.left = '-9999px';
+      document.body.appendChild(container);
 
-    // Create a root for React to render into
-    const root = createRoot(printContent);
-    
-    // Render the exercise sheet
-    root.render(
-      <HandwritingExerciseSheet
-        practiceLetters={analysis.practiceLetters}
-        improvements={analysis.improvements}
-        tips={analysis.tips}
-      />
-    );
+      // Create a root and render the exercise sheet
+      const root = createRoot(container);
+      root.render(
+        <HandwritingExerciseSheet
+          practiceLetters={analysis.practiceLetters}
+          improvements={analysis.improvements}
+          tips={analysis.tips}
+        />
+      );
 
-    // Wait a moment for the content to render
-    setTimeout(() => {
-      window.print();
+      // Wait for the content to render
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Convert the rendered content to canvas
+      const canvas = await html2canvas(container, {
+        scale: 2, // Higher quality
+        logging: false,
+        useCORS: true
+      });
+
+      // Create PDF
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgData = canvas.toDataURL('image/png');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      
+      // Download the PDF
+      pdf.save('handskriftsövning.pdf');
+
       // Cleanup
       root.unmount();
-      document.body.removeChild(printContent);
-    }, 100);
+      document.body.removeChild(container);
+
+      toast({
+        title: "PDF skapad!",
+        description: "Din övning har laddats ner som PDF.",
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "Ett fel uppstod",
+        description: "Kunde inte skapa PDF-filen. Försök igen.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingPDF(false);
+    }
   };
+
+  // ... keep existing code (isThinking render block)
 
   return (
     <div className="w-full space-y-6">
@@ -94,12 +135,17 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
         <div className="space-y-6">
           <div className="flex justify-end mb-4">
             <Button
-              onClick={handlePrint}
+              onClick={handleDownloadPDF}
               variant="outline"
               className="gap-2"
+              disabled={isGeneratingPDF}
             >
-              <Printer className="h-4 w-4" />
-              Skriv ut övningsblad
+              {isGeneratingPDF ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              {isGeneratingPDF ? 'Skapar PDF...' : 'Ladda ner övningsblad'}
             </Button>
           </div>
 
