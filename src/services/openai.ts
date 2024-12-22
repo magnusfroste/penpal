@@ -90,7 +90,15 @@ export const sendMessage = async (threadId: string, content: string, image?: str
     console.log('Starting assistant run...');
     const run = await openai.beta.threads.runs.create(threadId, {
       assistant_id: ASSISTANT_ID,
-      instructions: "Du är en erfaren lärare som hjälper en 8-årig elev med handstilen. Var pedagogisk, uppmuntrande och rolig! Efter analysen, fråga om eleven vill ha ett PDF-dokument med bokstäver att öva på."
+      instructions: `Du är en erfaren lärare som hjälper en 8-årig elev med handstilen. 
+      När du analyserar handstilen, dela upp din analys i tre tydliga delar:
+      
+      1. Styrkor - Berätta vad eleven gör bra (t.ex. bokstävernas storlek, mellanrum mellan ord, etc.)
+      2. Förbättringsområden - Förklara vänligt vad som kan bli bättre
+      3. Tips och övningar - Ge specifika och roliga övningar
+      
+      Var pedagogisk, uppmuntrande och rolig! Använd ett enkelt språk som ett barn förstår.
+      Efter analysen, fråga om eleven vill ha ett PDF-dokument med bokstäver att öva på.`
     });
 
     let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
