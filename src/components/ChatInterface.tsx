@@ -1,4 +1,3 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
 import AnalysisResponse from "./AnalysisResponse";
 
 interface Message {
@@ -17,7 +16,6 @@ interface ChatInterfaceProps {
 }
 
 export const ChatInterface = ({ messages }: ChatInterfaceProps) => {
-  // Polyfill for findLast
   const findLast = <T,>(array: T[], predicate: (value: T) => boolean): T | undefined => {
     for (let i = array.length - 1; i >= 0; i--) {
       if (predicate(array[i])) {
@@ -39,26 +37,24 @@ export const ChatInterface = ({ messages }: ChatInterfaceProps) => {
   }
 
   return (
-    <ScrollArea className="h-[400px] rounded-md border p-4">
-      <div className="chat-container">
-        {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`message ${
-              message.role === 'user' ? 'user-message' : 'assistant-message'
-            }`}
-          >
-            {message.image && (
-              <img
-                src={message.image}
-                alt="Handskriftsprov"
-                className="image-preview mb-2"
-              />
-            )}
-            <p>{message.content}</p>
-          </div>
-        ))}
-      </div>
-    </ScrollArea>
+    <div className="space-y-4">
+      {messages.map((message, index) => (
+        <div
+          key={index}
+          className={`p-4 rounded-lg max-w-full ${
+            message.role === 'user' ? 'bg-primary text-primary-foreground ml-auto' : 'bg-secondary text-secondary-foreground'
+          }`}
+        >
+          {message.image && (
+            <img
+              src={message.image}
+              alt="Handskriftsprov"
+              className="max-w-xs rounded-lg shadow-lg mx-auto mb-2"
+            />
+          )}
+          <p>{message.content}</p>
+        </div>
+      ))}
+    </div>
   );
 };

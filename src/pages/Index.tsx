@@ -116,11 +116,47 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background p-4">
-      <Card className="max-w-3xl mx-auto p-6">
+      <Card className="max-w-4xl mx-auto p-6">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-primary mb-2">Handwriting Analysis Assistant</h1>
-          <p className="text-muted-foreground">Upload your handwriting sample for analysis and personalized practice sheets</p>
+          <p className="text-muted-foreground mb-6">Upload your handwriting sample for analysis and personalized practice sheets</p>
           
+          <div className="flex gap-4 justify-center mb-8">
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handleFileUpload}
+              ref={fileInputRef}
+              className="hidden"
+            />
+            
+            <Button
+              onClick={handleCameraClick}
+              disabled={isLoading || isInitializing}
+              className="gap-2"
+            >
+              {isInitializing ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Camera className="h-4 w-4" />
+              )}
+              {isInitializing ? 'Initializing...' : 'Take Photo'}
+            </Button>
+
+            <Button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isLoading || isInitializing}
+              variant="outline"
+              className="gap-2"
+            >
+              <Upload className="h-4 w-4" />
+              Upload Image
+            </Button>
+          </div>
+
           {initError && (
             <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-md">
               <p className="font-semibold">Error initializing chat:</p>
@@ -130,42 +166,6 @@ const Index = () => {
         </div>
 
         <ChatInterface messages={messages} />
-
-        <div className="mt-4 flex gap-4 justify-center">
-          <input
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={handleFileUpload}
-            ref={fileInputRef}
-            className="hidden"
-          />
-          
-          <Button
-            onClick={handleCameraClick}
-            disabled={isLoading || isInitializing}
-            className="gap-2"
-          >
-            {isInitializing ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Camera className="h-4 w-4" />
-            )}
-            {isInitializing ? 'Initializing...' : 'Take Photo'}
-          </Button>
-
-          <Button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isLoading || isInitializing}
-            variant="outline"
-            className="gap-2"
-          >
-            <Upload className="h-4 w-4" />
-            Upload Image
-          </Button>
-        </div>
       </Card>
     </div>
   );

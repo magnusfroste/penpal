@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Check, Info, AlertTriangle } from "lucide-react";
 
 interface Analysis {
@@ -25,7 +24,6 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
   };
 
   if (!analysis.strengths.length && !analysis.improvements.length && !analysis.tips.length) {
-    // Fallback to text parsing if no JSON analysis
     const lines = message.content.split('\n').filter(line => line.trim());
     lines.forEach(line => {
       if (line.toLowerCase().includes('strength') || line.toLowerCase().includes('positive')) {
@@ -39,7 +37,7 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
   }
 
   return (
-    <ScrollArea className="h-[500px] w-full rounded-md border p-4">
+    <div className="w-full space-y-6">
       {message.image && (
         <div className="mb-6">
           <h3 className="text-lg font-semibold mb-2">Din handstil</h3>
@@ -97,7 +95,7 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
           </ul>
         </Card>
       </div>
-    </ScrollArea>
+    </div>
   );
 };
 
