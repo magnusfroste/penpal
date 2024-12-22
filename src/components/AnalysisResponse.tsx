@@ -87,30 +87,32 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
           </ul>
         </Card>
 
-        <Card className="p-4 bg-gradient-to-r from-blue-50 to-blue-100">
+        <div>
           <h3 className="text-lg font-semibold flex items-center gap-2 text-blue-700 mb-3">
             <Info className="h-5 w-5" />
             Tips och övningar
           </h3>
-          <ul className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {analysis.tips.map((point, index) => (
-              <li key={index} className="flex items-center justify-between gap-2 text-blue-800">
-                <div className="flex items-start gap-2">
-                  <span className="mt-1">•</span>
-                  {point}
+              <Card 
+                key={index} 
+                className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-blue-800">{point}</p>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-blue-700 hover:text-blue-800 hover:bg-blue-100 flex-shrink-0"
+                    onClick={() => handlePlayTip(point)}
+                  >
+                    <Play className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-blue-700 hover:text-blue-800 hover:bg-blue-100"
-                  onClick={() => handlePlayTip(point)}
-                >
-                  <Play className="h-4 w-4" />
-                </Button>
-              </li>
+              </Card>
             ))}
-          </ul>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
