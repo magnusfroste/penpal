@@ -6,8 +6,21 @@ import { Loader2, Upload, Camera } from "lucide-react";
 import { ChatInterface } from '@/components/ChatInterface';
 import { createThread, sendMessage } from '@/services/openai';
 
+interface Analysis {
+  strengths: string[];
+  improvements: string[];
+  tips: string[];
+}
+
+interface Message {
+  role: string;
+  content: string;
+  image?: string;
+  analysis?: Analysis;
+}
+
 const Index = () => {
-  const [messages, setMessages] = useState<Array<{ role: string; content: string; image?: string }>>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [threadId, setThreadId] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
@@ -84,7 +97,8 @@ const Index = () => {
       
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: response.text
+        content: response.text,
+        analysis: response.analysis
       }]);
 
     } catch (error) {

@@ -104,6 +104,19 @@ export const sendMessage = async (threadId: string, content: string, image?: str
       - Jämför gärna med roliga saker som barn känner till
       - Ge konkreta exempel på hur förbättringarna kan göras
       
+      Formatera svaret så här:
+      STYRKOR:
+      - [styrka 1]
+      - [styrka 2]
+      
+      FÖRBÄTTRINGSOMRÅDEN:
+      - [förbättring 1]
+      - [förbättring 2]
+      
+      TIPS OCH ÖVNINGAR:
+      - [tips 1]
+      - [tips 2]
+      
       Efter analysen, fråga om eleven vill ha ett roligt PDF-dokument med bokstäver att öva på, anpassat efter deras behov.`
     });
 
@@ -124,10 +137,45 @@ export const sendMessage = async (threadId: string, content: string, image?: str
     
     if (lastMessage.type === 'text') {
       console.log('Response received successfully');
-      return { text: lastMessage.text.value };
+      const text = lastMessage.text.value;
+      
+      // Parse the response into sections
+      const analysis = {
+        strengths: [] as string[],
+        improvements: [] as string[],
+        tips: [] as string[]
+      };
+      
+      let currentSection = '';
+      const lines = text.split('\n');
+      
+      for (const line of lines) {
+        const trimmedLine = line.trim();
+        if (trimmedLine.startsWith('STYRKOR:')) {
+          currentSection = 'strengths';
+        } else if (trimmedLine.startsWith('FÖRBÄTTRINGSOMRÅDEN:')) {
+          currentSection = 'improvements';
+        } else if (trimmedLine.startsWith('TIPS OCH ÖVNINGAR:')) {
+          currentSection = 'tips';
+        } else if (trimmedLine.startsWith('-') && currentSection) {
+          analysis[currentSection].push(trimmedLine.substring(1).trim());
+        }
+      }
+      
+      return { 
+        text,
+        analysis
+      };
     } else {
       console.log('Non-text response received');
-      return { text: 'Jag tog emot din bild men kan bara svara med text.' };
+      return { 
+        text: 'Jag tog emot din bild men kan bara svara med text.',
+        analysis: {
+          strengths: [],
+          improvements: [],
+          tips: []
+        }
+      };
     }
   } catch (error) {
     console.error('Error in sendMessage:', error);
