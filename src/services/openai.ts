@@ -7,26 +7,32 @@ interface SecretResponse {
 }
 
 const getOpenAIKey = async () => {
+  console.log('Fetching OpenAI API key...');
   const { data, error } = await supabase.rpc('get_secret', {
     secret_name: 'OPENAI_API_KEY'
   });
   
   if (error) {
     console.error('Error fetching OpenAI API key:', error);
-    throw error;
+    throw new Error('Failed to fetch OpenAI API key: ' + error.message);
   }
   
-  // First cast to unknown, then to our expected interface
-  const secretData = (data as unknown) as SecretResponse;
-  if (!secretData || !secretData.value) {
-    console.error('OpenAI API key not found or invalid');
-    throw new Error('OpenAI API key not found or invalid');
+  if (!data) {
+    console.error('No data returned when fetching OpenAI API key');
+    throw new Error('No API key found. Please set your OpenAI API key in Supabase secrets.');
+  }
+
+  // Cast the data to our expected type
+  const secretData = data as unknown as SecretResponse;
+  
+  if (!secretData.value) {
+    console.error('API key value is empty or undefined');
+    throw new Error('Invalid API key format. Please check your OpenAI API key in Supabase secrets.');
   }
   
+  console.log('API key retrieved successfully');
   return secretData.value;
 };
-
-const ASSISTANT_ID = 'asst_OBHVa19qPFsuQpBwX9ai6daM';
 
 export const createThread = async () => {
   try {
