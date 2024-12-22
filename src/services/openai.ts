@@ -1,16 +1,24 @@
 import OpenAI from 'openai';
 import { supabase } from '@/integrations/supabase/client';
 
+interface SecretResponse {
+  value: string;
+}
+
 const getOpenAIKey = async () => {
   const { data, error } = await supabase.rpc('get_secret', {
     secret_name: 'OPENAI_API_KEY'
   });
   
   if (error) throw error;
-  if (!data || typeof data.value !== 'string') {
+  
+  // Type assertion to ensure data matches our expected interface
+  const secretData = data as SecretResponse;
+  if (!secretData || !secretData.value) {
     throw new Error('OpenAI API key not found or invalid');
   }
-  return data.value;
+  
+  return secretData.value;
 };
 
 const ASSISTANT_ID = 'asst_OBHVa19qPFsuQpBwX9ai6daM';
