@@ -7,7 +7,7 @@ import { ChatInterface } from '@/components/ChatInterface';
 import { createThread, sendMessage } from '@/services/openai';
 
 const Index = () => {
-  const [messages, setMessages] = useState<Array<{ role: string; content: string; image?: string }>>([]);
+  const [messages, setMessages] = useState<Array<{ role: string; content: string; image?: string; analysis?: any }>>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [threadId, setThreadId] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
@@ -81,12 +81,16 @@ const Index = () => {
       setMessages(prev => [...prev, userMessage]);
 
       const response = await sendMessage(threadId, userMessage.content, base64Image);
+      console.log('Response from API:', response);
       
-      setMessages(prev => [...prev, {
+      const assistantMessage = {
         role: 'assistant',
-        content: response.text
-      }]);
+        content: response.text,
+        analysis: response.analysis
+      };
 
+      setMessages(prev => [...prev, assistantMessage]);
+      
     } catch (error) {
       console.error('File upload error:', error);
       toast({

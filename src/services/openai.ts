@@ -11,20 +11,19 @@ const getOpenAIKey = () => {
 };
 
 export const createThread = async () => {
-  // We'll keep this simple since we don't need threads anymore
   return { id: 'direct-completion' };
 };
 
 export const sendMessage = async (threadId: string, content: string, image?: string) => {
   try {
-    console.log('Starting to process message...');
+    console.log('Starting to process message with image:', !!image);
     const apiKey = getOpenAIKey();
     const openai = new OpenAI({
       apiKey,
       dangerouslyAllowBrowser: true
     });
 
-    let messages: any[] = [
+    let messages = [
       {
         role: "system",
         content: `You are a handwriting analysis expert helping an 8-year-old student improve their handwriting. 
@@ -63,12 +62,13 @@ export const sendMessage = async (threadId: string, content: string, image?: str
       max_tokens: 1000,
     });
 
+    console.log('Response received:', completion.choices[0].message);
     const response = completion.choices[0].message.content;
-    console.log('Response received:', response);
 
     try {
-      // Parse the JSON response
       const parsedResponse = JSON.parse(response || '{}');
+      console.log('Parsed response:', parsedResponse);
+      
       return {
         text: response,
         analysis: {
@@ -79,8 +79,14 @@ export const sendMessage = async (threadId: string, content: string, image?: str
       };
     } catch (error) {
       console.error('Error parsing JSON response:', error);
-      // Fallback to text response if JSON parsing fails
-      return { text: response };
+      return {
+        text: response,
+        analysis: {
+          strengths: [],
+          improvements: [],
+          tips: [response] // Use the raw response as a tip if parsing fails
+        }
+      };
     }
   } catch (error) {
     console.error('Error in sendMessage:', error);
