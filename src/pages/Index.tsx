@@ -118,8 +118,8 @@ const Index = () => {
     <div className="min-h-screen bg-background p-4">
       <Card className="max-w-4xl mx-auto p-6">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-primary mb-2">Handwriting Analysis Assistant</h1>
-          <p className="text-muted-foreground mb-6">Upload your handwriting sample for analysis and personalized practice sheets</p>
+          <h1 className="text-2xl font-bold text-primary mb-2">Handstilsanalys</h1>
+          <p className="text-muted-foreground mb-6">Ladda upp ett prov på din handstil för analys och personliga övningsblad</p>
           
           <div className="flex gap-4 justify-center mb-8">
             <input
@@ -143,7 +143,7 @@ const Index = () => {
               ) : (
                 <Camera className="h-4 w-4" />
               )}
-              {isInitializing ? 'Initializing...' : 'Take Photo'}
+              {isInitializing ? 'Initierar...' : 'Ta foto'}
             </Button>
 
             <Button
@@ -153,13 +153,13 @@ const Index = () => {
               className="gap-2"
             >
               <Upload className="h-4 w-4" />
-              Upload Image
+              Ladda upp bild
             </Button>
           </div>
 
           {initError && (
             <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-md">
-              <p className="font-semibold">Error initializing chat:</p>
+              <p className="font-semibold">Ett fel uppstod vid initiering:</p>
               <p className="text-sm">{initError}</p>
             </div>
           )}
