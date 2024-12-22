@@ -67,12 +67,12 @@ export const sendMessage = async (threadId: string, content: string, image?: str
 
       console.log('File uploaded successfully:', uploadedFile.id);
       
+      // Update assistant without specifying tools
       await openai.beta.assistants.update(
         ASSISTANT_ID,
         {
-          tools: [{ type: "code_interpreter" }],
           file_ids: [uploadedFile.id]
-        } as any
+        }
       );
 
       messageContent.push({
@@ -91,8 +91,7 @@ export const sendMessage = async (threadId: string, content: string, image?: str
     console.log('Starting assistant run...');
     const run = await openai.beta.threads.runs.create(threadId, {
       assistant_id: ASSISTANT_ID,
-      instructions: "Please analyze the handwriting sample and provide your analysis in a JSON format.",
-      response_format: { type: "json_object" }
+      instructions: "Please analyze the handwriting sample and provide your analysis in a JSON format."
     });
 
     let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
