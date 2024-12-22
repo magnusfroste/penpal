@@ -67,11 +67,11 @@ export const sendMessage = async (threadId: string, content: string, image?: str
 
       console.log('File uploaded successfully:', uploadedFile.id);
       
-      // Update the assistant with the new file
+      // Update the assistant with the new file using the correct property name
       await openai.beta.assistants.update(
         ASSISTANT_ID,
         {
-          file_ids: [uploadedFile.id],
+          fileIds: [uploadedFile.id],
           tools: [{ type: "code_interpreter" }]
         }
       );
