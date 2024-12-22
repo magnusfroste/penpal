@@ -67,11 +67,11 @@ export const sendMessage = async (threadId: string, content: string, image?: str
 
       console.log('File uploaded successfully:', uploadedFile.id);
       
-      // Add the file to the assistant using the correct API method
-      await openai.beta.assistants.addFile({
-        assistant_id: ASSISTANT_ID,
-        file_id: uploadedFile.id
-      });
+      // Create a new file attachment for the assistant using the correct API method
+      await openai.beta.assistants.files.create(
+        ASSISTANT_ID,
+        { file_id: uploadedFile.id }
+      );
     }
 
     console.log('Starting assistant run...');
