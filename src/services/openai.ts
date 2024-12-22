@@ -27,13 +27,13 @@ export const sendMessage = async (threadId: string, content: string, image?: str
       {
         role: "system",
         content: `You are a handwriting analysis expert helping an 8-year-old student improve their handwriting. 
-        Be pedagogical, encouraging, and fun! Analyze the handwriting and return your response in this exact JSON format:
+        Be pedagogical, encouraging, and fun! Analyze the handwriting and return ONLY a JSON response in this format:
         {
           "strengths": ["strength1", "strength2", ...],
           "improvements": ["improvement1", "improvement2", ...],
           "tips": ["tip1", "tip2", ...]
         }
-        Keep each point concise and child-friendly.`
+        Keep each point concise and child-friendly. Do not include any markdown formatting or additional text.`
       }
     ];
 
@@ -66,7 +66,9 @@ export const sendMessage = async (threadId: string, content: string, image?: str
     const response = completion.choices[0].message.content;
 
     try {
-      const parsedResponse = JSON.parse(response || '{}');
+      // Remove any markdown formatting if present
+      const cleanedResponse = response?.replace(/```json\n|\n```/g, '').trim() || '{}';
+      const parsedResponse = JSON.parse(cleanedResponse);
       console.log('Parsed response:', parsedResponse);
       
       return {
@@ -79,12 +81,13 @@ export const sendMessage = async (threadId: string, content: string, image?: str
       };
     } catch (error) {
       console.error('Error parsing JSON response:', error);
+      // Fallback to empty arrays if parsing fails
       return {
         text: response,
         analysis: {
           strengths: [],
           improvements: [],
-          tips: [response] // Use the raw response as a tip if parsing fails
+          tips: []
         }
       };
     }

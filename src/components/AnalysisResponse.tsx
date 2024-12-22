@@ -23,19 +23,6 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
     tips: []
   };
 
-  if (!analysis.strengths.length && !analysis.improvements.length && !analysis.tips.length) {
-    const lines = message.content.split('\n').filter(line => line.trim());
-    lines.forEach(line => {
-      if (line.toLowerCase().includes('strength') || line.toLowerCase().includes('positive')) {
-        analysis.strengths.push(line);
-      } else if (line.toLowerCase().includes('improve') || line.toLowerCase().includes('work on')) {
-        analysis.improvements.push(line);
-      } else {
-        analysis.tips.push(line);
-      }
-    });
-  }
-
   return (
     <div className="w-full space-y-6">
       {message.image && (
