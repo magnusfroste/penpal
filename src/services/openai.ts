@@ -42,8 +42,13 @@ export const sendMessage = async (threadId: string, content: string, image?: str
       dangerouslyAllowBrowser: true
     });
 
-    let messageContent = content;
+    // First, create the message with text content
+    await openai.beta.threads.messages.create(threadId, {
+      role: 'user',
+      content: content
+    });
 
+    // If there's an image, upload it and attach it to the assistant
     if (image) {
       console.log('Processing image upload...');
       const base64Data = image.split(',')[1];
@@ -62,23 +67,9 @@ export const sendMessage = async (threadId: string, content: string, image?: str
 
       console.log('File uploaded successfully:', uploadedFile.id);
       
-      // Create message with file reference
-      await openai.beta.threads.messages.create(threadId, {
-        role: 'user',
-        content: messageContent,
-      });
-
-      // Add the file to the message separately
-      await openai.beta.threads.messages.create(threadId, {
-        role: 'user',
-        content: '',
+      // Update the assistant with the new file
+      await openai.beta.assistants.update(ASSISTANT_ID, {
         file_ids: [uploadedFile.id]
-      });
-    } else {
-      // Send message without file
-      await openai.beta.threads.messages.create(threadId, {
-        role: 'user',
-        content: messageContent,
       });
     }
 
