@@ -23,11 +23,7 @@ const Index = () => {
         
         const thread = await createThread();
         setThreadId(thread.id);
-        
-        setMessages([{
-          role: 'assistant',
-          content: 'Hello! I\'m ready to analyze your handwriting. Please upload a clear image of your handwriting sample.'
-        }]);
+        setMessages([]); // Initialize with empty messages array instead of welcome message
         
       } catch (error) {
         console.error('Thread initialization error:', error);

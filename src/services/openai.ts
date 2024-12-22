@@ -23,7 +23,7 @@ export const sendMessage = async (threadId: string, content: string, image?: str
       dangerouslyAllowBrowser: true
     });
 
-    let messages = [
+    const messages: Array<{ role: string; content: any }> = [
       {
         role: "system",
         content: `You are a handwriting analysis expert helping an 8-year-old student improve their handwriting. 
@@ -34,31 +34,31 @@ export const sendMessage = async (threadId: string, content: string, image?: str
           "tips": ["tip1", "tip2", ...]
         }
         Keep each point concise and child-friendly.`
-      },
-      {
-        role: "user",
-        content: [
-          {
-            type: "text",
-            text: "Please analyze this handwriting sample:"
-          }
-        ]
       }
     ];
 
-    if (image) {
-      messages[1].content.push({
-        type: "image_url",
-        image_url: {
-          url: image
+    const userMessage = {
+      role: "user",
+      content: image ? [
+        {
+          type: "text",
+          text: "Please analyze this handwriting sample:"
+        },
+        {
+          type: "image_url",
+          image_url: {
+            url: image
+          }
         }
-      });
-    }
+      ] : content
+    };
+
+    messages.push(userMessage);
 
     console.log('Sending request to GPT-4o...');
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
-      messages: messages,
+      messages: messages as any,
       max_tokens: 1000,
     });
 
