@@ -12,7 +12,6 @@ const getOpenAIKey = async () => {
   console.log('Starting OpenAI API key retrieval...');
   
   try {
-    // Call the get_secret function with the correct parameter format
     const { data, error } = await supabase.rpc('get_secret', {
       secret_name: 'OPENAI_API_KEY'
     });
@@ -29,8 +28,6 @@ const getOpenAIKey = async () => {
       throw new Error('No API key found. Please check if OPENAI_API_KEY is set in Supabase secrets.');
     }
 
-    // The secret value is stored in current_setting('app.settings.OPENAI_API_KEY')
-    // We need to access it through the get_secret function which returns it in the 'value' field
     const secretValue = data.value;
     console.log('Secret value type:', typeof secretValue);
     console.log('Secret value exists:', !!secretValue);
@@ -85,7 +82,6 @@ export const sendMessage = async (threadId: string, content: string, image?: str
 
     if (image) {
       console.log('Processing image upload...');
-      // Convert base64 to blob
       const base64Data = image.split(',')[1];
       const binaryData = atob(base64Data);
       const array = new Uint8Array(binaryData.length);
@@ -94,10 +90,8 @@ export const sendMessage = async (threadId: string, content: string, image?: str
       }
       const blob = new Blob([array], { type: 'image/jpeg' });
 
-      // Create a File object from the blob
       const file = new File([blob], 'handwriting.jpg', { type: 'image/jpeg' });
 
-      // Upload the file to OpenAI
       const uploadedFile = await openai.files.create({
         file,
         purpose: 'assistants',
@@ -107,7 +101,6 @@ export const sendMessage = async (threadId: string, content: string, image?: str
       console.log('File uploaded successfully:', fileId);
     }
 
-    // Add the message to the thread
     const messageParams: any = {
       role: 'user',
       content: content,
@@ -120,13 +113,11 @@ export const sendMessage = async (threadId: string, content: string, image?: str
     console.log('Sending message with params:', messageParams);
     await openai.beta.threads.messages.create(threadId, messageParams);
 
-    // Run the assistant
     console.log('Starting assistant run...');
     const run = await openai.beta.threads.runs.create(threadId, {
       assistant_id: ASSISTANT_ID
     });
 
-    // Wait for the run to complete
     let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
     while (runStatus.status !== 'completed') {
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -139,11 +130,9 @@ export const sendMessage = async (threadId: string, content: string, image?: str
       }
     }
 
-    // Get the assistant's response
     const messages = await openai.beta.threads.messages.list(threadId);
     const lastMessage = messages.data[0].content[0];
     
-    // Extract text content from the response
     if (lastMessage.type === 'text') {
       console.log('Response received successfully');
       return { text: lastMessage.text.value };
