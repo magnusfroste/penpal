@@ -56,9 +56,9 @@ export const sendMessage = async (threadId: string, content: string, image?: str
       });
     }
 
-    console.log('Sending request to GPT-4 Vision...');
+    console.log('Sending request to GPT-4o...');
     const completion = await openai.chat.completions.create({
-      model: "gpt-4-vision-preview",
+      model: "gpt-4o",
       messages: messages,
       max_tokens: 1000,
     });
