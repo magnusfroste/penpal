@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Check, Info, AlertTriangle, Loader2, Star, PenTool } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Analysis {
   strengths: string[];
@@ -20,6 +21,7 @@ interface AnalysisResponseProps {
 
 const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
   const [isThinking, setIsThinking] = React.useState(true);
+  const [showImage, setShowImage] = React.useState(false);
 
   React.useEffect(() => {
     // Simulate AI thinking time for a smoother UX
@@ -50,6 +52,15 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
         <div className="flex flex-col items-center justify-center p-12 space-y-4">
           <Loader2 className="h-12 w-12 animate-spin text-primary" />
           <p className="text-lg text-muted-foreground">AI:n analyserar din handstil...</p>
+          {message.image && (
+            <Card className="p-4 mt-4">
+              <img
+                src={message.image}
+                alt="Handskriftsprov"
+                className="rounded-lg shadow-lg mx-auto max-h-[300px] object-contain"
+              />
+            </Card>
+          )}
         </div>
       ) : (
         <div className="space-y-6">
@@ -96,30 +107,32 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
               </div>
             </Card>
 
-            <div className="space-y-4">
-              <Card className="p-4 bg-gradient-to-r from-purple-50 to-purple-100">
+            <Card className="p-4 bg-gradient-to-r from-purple-50 to-purple-100">
+              <Button
+                variant="ghost"
+                className="w-full text-left p-0 h-auto hover:bg-transparent"
+                onClick={() => setShowImage(!showImage)}
+              >
                 <h3 className="text-lg font-semibold flex items-center gap-2 text-purple-700 mb-3">
                   <PenTool className="h-5 w-5" />
                   Bokstäver att öva på
                 </h3>
-                <div className="flex flex-wrap">
-                  {analysis.practiceLetters.map((letter, index) => (
-                    <LetterBadge key={index} letter={letter} />
-                  ))}
-                </div>
-              </Card>
-
-              {message.image && (
-                <Card className="p-4">
-                  <h3 className="text-lg font-semibold mb-2">Din handstil</h3>
+              </Button>
+              <div className="flex flex-wrap mb-3">
+                {analysis.practiceLetters.map((letter, index) => (
+                  <LetterBadge key={index} letter={letter} />
+                ))}
+              </div>
+              {showImage && message.image && (
+                <div className="mt-4">
                   <img
                     src={message.image}
                     alt="Handskriftsprov"
                     className="rounded-lg shadow-lg mx-auto max-h-[300px] object-contain"
                   />
-                </Card>
+                </div>
               )}
-            </div>
+            </Card>
           </div>
 
           <div>
