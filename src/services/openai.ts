@@ -7,6 +7,9 @@ const getOpenAIKey = async () => {
   });
   
   if (error) throw error;
+  if (!data || typeof data.value !== 'string') {
+    throw new Error('OpenAI API key not found or invalid');
+  }
   return data.value;
 };
 
