@@ -45,7 +45,7 @@ export const sendMessage = async (threadId: string, content: string, image?: str
     let messageContent: any[] = [
       {
         type: 'text',
-        text: content + "\n\nPlease provide your analysis in JSON format with the following structure:\n{\n  strengths: string[],\n  improvements: string[],\n  tips: string[]\n}"
+        text: content
       }
     ];
 
@@ -72,7 +72,7 @@ export const sendMessage = async (threadId: string, content: string, image?: str
         {
           tools: [{ type: "code_interpreter" }],
           file_ids: [uploadedFile.id]
-        } as any
+        }
       );
 
       messageContent.push({
@@ -90,7 +90,13 @@ export const sendMessage = async (threadId: string, content: string, image?: str
 
     console.log('Starting assistant run...');
     const run = await openai.beta.threads.runs.create(threadId, {
-      assistant_id: ASSISTANT_ID
+      assistant_id: ASSISTANT_ID,
+      instructions: `Please analyze the handwriting sample and provide your analysis in the following format:
+      {
+        "strengths": ["strength1", "strength2", ...],
+        "improvements": ["improvement1", "improvement2", ...],
+        "tips": ["tip1", "tip2", ...]
+      }`
     });
 
     let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
