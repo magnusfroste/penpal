@@ -90,8 +90,7 @@ export const sendMessage = async (threadId: string, content: string, image?: str
     console.log('Starting assistant run...');
     const run = await openai.beta.threads.runs.create(threadId, {
       assistant_id: ASSISTANT_ID,
-      instructions: "Please analyze the handwriting sample and provide your analysis in JSON format. Include 'strengths', 'improvements', and 'tips' fields in your JSON response.",
-      response_format: { type: "json_object" }
+      instructions: "Du är en erfaren lärare som hjälper en 8-årig elev med handstilen. Var pedagogisk, uppmuntrande och rolig! Efter analysen, fråga om eleven vill ha ett PDF-dokument med bokstäver att öva på."
     });
 
     let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
@@ -111,20 +110,10 @@ export const sendMessage = async (threadId: string, content: string, image?: str
     
     if (lastMessage.type === 'text') {
       console.log('Response received successfully');
-      try {
-        // Try to parse the response as JSON
-        const jsonMatch = lastMessage.text.value.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          const jsonResponse = JSON.parse(jsonMatch[0]);
-          return { text: lastMessage.text.value, analysis: jsonResponse };
-        }
-      } catch (error) {
-        console.log('Failed to parse JSON response:', error);
-      }
       return { text: lastMessage.text.value };
     } else {
       console.log('Non-text response received');
-      return { text: 'I received your image but can only respond with text messages.' };
+      return { text: 'Jag tog emot din bild men kan bara svara med text.' };
     }
   } catch (error) {
     console.error('Error in sendMessage:', error);
