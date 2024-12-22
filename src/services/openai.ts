@@ -67,12 +67,12 @@ export const sendMessage = async (threadId: string, content: string, image?: str
 
       console.log('File uploaded successfully:', uploadedFile.id);
       
-      // Update assistant without specifying tools
+      // Add file to assistant
       await openai.beta.assistants.update(
         ASSISTANT_ID,
         {
           file_ids: [uploadedFile.id]
-        }
+        } as any // Using type assertion as a temporary fix
       );
 
       messageContent.push({
