@@ -24,17 +24,39 @@ export const sendMessage = async (threadId: string, content: string, image?: str
   });
 
   try {
+    let fileId: string | undefined;
+
+    // If an image is provided, upload it first
+    if (image) {
+      // Convert base64 to blob
+      const base64Data = image.split(',')[1];
+      const binaryData = atob(base64Data);
+      const array = new Uint8Array(binaryData.length);
+      for (let i = 0; i < binaryData.length; i++) {
+        array[i] = binaryData.charCodeAt(i);
+      }
+      const blob = new Blob([array], { type: 'image/jpeg' });
+
+      // Create a File object from the blob
+      const file = new File([blob], 'handwriting.jpg', { type: 'image/jpeg' });
+
+      // Upload the file to OpenAI
+      const uploadedFile = await openai.files.create({
+        file,
+        purpose: 'assistants',
+      });
+
+      fileId = uploadedFile.id;
+    }
+
     // Add the message to the thread
-    const messageParams: OpenAI.Beta.Threads.MessageCreateParams = {
+    const messageParams: any = {
       role: 'user',
       content: content,
     };
 
-    // If an image is provided, we'll need to handle file upload first
-    if (image) {
-      // Note: This is a placeholder. You'll need to implement actual file upload logic
-      // This might involve uploading the file to OpenAI and getting a file ID
-      // messageParams.file_ids = [uploadedFileId];
+    if (fileId) {
+      messageParams.file_ids = [fileId];
     }
 
     await openai.beta.threads.messages.create(threadId, messageParams);

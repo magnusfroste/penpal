@@ -1,16 +1,34 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, Upload, Camera } from "lucide-react";
 import { ChatInterface } from '@/components/ChatInterface';
+import { createThread, sendMessage } from '@/services/openai';
 
 const Index = () => {
   const [messages, setMessages] = useState<Array<{ role: string; content: string; image?: string }>>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [threadId, setThreadId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const initThread = async () => {
+      try {
+        const thread = await createThread();
+        setThreadId(thread.id);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to initialize chat. Please check your API key.",
+          variant: "destructive"
+        });
+      }
+    };
+
+    initThread();
+  }, [toast]);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -25,33 +43,43 @@ const Index = () => {
       return;
     }
 
+    if (!threadId) {
+      toast({
+        title: "Error",
+        description: "Chat not initialized. Please try again.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       setIsLoading(true);
       const base64Image = await convertToBase64(file);
       
       // Add the image message to the chat
-      setMessages(prev => [...prev, {
+      const userMessage = {
         role: 'user',
         content: 'Here is my handwriting sample:',
         image: base64Image
-      }]);
+      };
+      
+      setMessages(prev => [...prev, userMessage]);
 
-      // Here we would normally make the API call to OpenAI
-      // For now, we'll add a placeholder response
-      setTimeout(() => {
-        setMessages(prev => [...prev, {
-          role: 'assistant',
-          content: 'I notice that your letter "a" could use some improvement. The loop seems a bit inconsistent. Would you like some practice sheets for this letter?'
-        }]);
-        setIsLoading(false);
-      }, 2000);
+      // Send the message to the assistant
+      const response = await sendMessage(threadId, userMessage.content, base64Image);
+      
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: response.text
+      }]);
 
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to process image",
+        description: "Failed to process image. Please try again.",
         variant: "destructive"
       });
+    } finally {
       setIsLoading(false);
     }
   };
