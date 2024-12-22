@@ -5,7 +5,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, Camera } from "lucide-react";
 import { ChatInterface } from '@/components/ChatInterface';
 import { createThread, sendMessage } from '@/services/openai';
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Index = () => {
   const [messages, setMessages] = useState<Array<{ role: string; content: string; image?: string }>>([]);
@@ -13,7 +12,6 @@ const Index = () => {
   const [threadId, setThreadId] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [initError, setInitError] = useState<string | null>(null);
-  const [debugInfo, setDebugInfo] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -22,18 +20,8 @@ const Index = () => {
       try {
         setIsInitializing(true);
         setInitError(null);
-        setDebugInfo('Starting initialization...');
-        console.log('Starting thread initialization...');
         
-        // Add event listener for console logs
-        const originalConsoleLog = console.log;
-        console.log = (...args) => {
-          setDebugInfo(prev => prev + '\n' + args.join(' '));
-          originalConsoleLog.apply(console, args);
-        };
-
         const thread = await createThread();
-        console.log('Thread created successfully:', thread.id);
         setThreadId(thread.id);
         
         setMessages([{
@@ -41,13 +29,10 @@ const Index = () => {
           content: 'Hello! I\'m ready to analyze your handwriting. Please upload a clear image of your handwriting sample.'
         }]);
         
-        // Restore original console.log
-        console.log = originalConsoleLog;
       } catch (error) {
         console.error('Thread initialization error:', error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
         setInitError(errorMessage);
-        setDebugInfo(prev => prev + '\nError: ' + errorMessage);
         toast({
           title: "Initialization Error",
           description: errorMessage,
@@ -135,16 +120,6 @@ const Index = () => {
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-primary mb-2">Handwriting Analysis Assistant</h1>
           <p className="text-muted-foreground">Upload your handwriting sample for analysis and personalized practice sheets</p>
-          
-          {debugInfo && (
-            <Alert className="mt-4 text-left">
-              <AlertDescription>
-                <pre className="whitespace-pre-wrap text-xs">
-                  {debugInfo}
-                </pre>
-              </AlertDescription>
-            </Alert>
-          )}
           
           {initError && (
             <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-md">
