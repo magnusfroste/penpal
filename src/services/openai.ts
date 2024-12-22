@@ -6,6 +6,8 @@ interface SecretResponse {
   value: string;
 }
 
+const ASSISTANT_ID = 'asst_OBHVa19qPFsuQpBwX9ai6daM';
+
 const getOpenAIKey = async () => {
   console.log('Fetching OpenAI API key...');
   const { data, error } = await supabase.rpc('get_secret', {
