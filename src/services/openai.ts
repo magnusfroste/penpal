@@ -1,59 +1,21 @@
 import OpenAI from 'openai';
-import { supabase } from '@/integrations/supabase/client';
-import { Json } from '@/integrations/supabase/types';
-
-interface SecretResponse {
-  value: string;
-}
 
 const ASSISTANT_ID = 'asst_OBHVa19qPFsuQpBwX9ai6daM';
 
-const getOpenAIKey = async () => {
-  console.log('Starting OpenAI API key retrieval...');
+const getOpenAIKey = () => {
+  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
   
-  try {
-    const { data, error } = await supabase.rpc('get_secret', {
-      secret_name: 'OPENAI_API_KEY'
-    });
-    
-    console.log('Raw Supabase response:', JSON.stringify(data, null, 2));
-    
-    if (error) {
-      console.error('Error fetching OpenAI API key:', error);
-      throw new Error('Failed to fetch OpenAI API key: ' + error.message);
-    }
-    
-    if (!data) {
-      console.error('No data returned from Supabase');
-      throw new Error('No API key found. Please check if OPENAI_API_KEY is set in Supabase secrets.');
-    }
-
-    // Safely cast the response and extract the value
-    const secretValue = (data as { value: string }).value;
-    
-    console.log('Secret value type:', typeof secretValue);
-    console.log('Secret value exists:', !!secretValue);
-
-    if (!secretValue) {
-      console.error('API key is empty');
-      throw new Error('OpenAI API key is not set. Please add your API key in the Supabase secrets.');
-    }
-
-    return secretValue;
-  } catch (error) {
-    console.error('Unexpected error in getOpenAIKey:', error);
-    throw error;
+  if (!apiKey) {
+    throw new Error('OpenAI API key is not set in environment variables');
   }
+  
+  return apiKey;
 };
 
 export const createThread = async () => {
   try {
     console.log('Starting thread creation...');
-    const apiKey = await getOpenAIKey();
-    
-    if (!apiKey) {
-      throw new Error('Failed to retrieve OpenAI API key');
-    }
+    const apiKey = getOpenAIKey();
     
     console.log('Initializing OpenAI client...');
     const openai = new OpenAI({
@@ -74,7 +36,7 @@ export const createThread = async () => {
 export const sendMessage = async (threadId: string, content: string, image?: string) => {
   try {
     console.log('Starting to send message to thread:', threadId);
-    const apiKey = await getOpenAIKey();
+    const apiKey = getOpenAIKey();
     const openai = new OpenAI({
       apiKey,
       dangerouslyAllowBrowser: true
