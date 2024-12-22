@@ -1,6 +1,8 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
-import { Check, Info, AlertTriangle, Loader2, Star, PenTool } from "lucide-react";
+import { Check, Info, AlertTriangle, Loader2, Star, PenTool, Printer } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import HandwritingExerciseSheet from './HandwritingExerciseSheet';
 
 interface Analysis {
   strengths: string[];
@@ -23,7 +25,6 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
   const [showImage, setShowImage] = React.useState(false);
 
   React.useEffect(() => {
-    // Simulate AI thinking time for a smoother UX
     const timer = setTimeout(() => {
       setIsThinking(false);
     }, 1500);
@@ -45,6 +46,38 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
     </span>
   );
 
+  const handlePrint = () => {
+    const printContent = document.createElement('div');
+    printContent.style.position = 'fixed';
+    printContent.style.left = '-9999px';
+    document.body.appendChild(printContent);
+
+    const exerciseSheet = document.createElement('div');
+    exerciseSheet.innerHTML = `
+      <style>
+        @media print {
+          body { margin: 0; padding: 20px; }
+          .exercise-page { page-break-after: always; }
+        }
+      </style>
+    `;
+    
+    // Render the exercise sheet component
+    const ReactDOM = require('react-dom');
+    ReactDOM.render(
+      <HandwritingExerciseSheet
+        practiceLetters={analysis.practiceLetters}
+        improvements={analysis.improvements}
+        tips={analysis.tips}
+      />,
+      exerciseSheet
+    );
+    
+    printContent.appendChild(exerciseSheet);
+    window.print();
+    document.body.removeChild(printContent);
+  };
+
   return (
     <div className="w-full space-y-6">
       {isThinking ? (
@@ -63,6 +96,17 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
         </div>
       ) : (
         <div className="space-y-6">
+          <div className="flex justify-end mb-4">
+            <Button
+              onClick={handlePrint}
+              variant="outline"
+              className="gap-2"
+            >
+              <Printer className="h-4 w-4" />
+              Skriv ut övningsblad
+            </Button>
+          </div>
+
           <Card className="p-4 bg-gradient-to-r from-green-50 to-green-100">
             <h3 className="text-lg font-semibold flex items-center gap-2 text-green-700 mb-3">
               <Check className="h-5 w-5" />
@@ -152,6 +196,14 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
           </div>
         </div>
       )}
+
+      <div className="hidden">
+        <HandwritingExerciseSheet
+          practiceLetters={analysis.practiceLetters}
+          improvements={analysis.improvements}
+          tips={analysis.tips}
+        />
+      </div>
     </div>
   );
 };
