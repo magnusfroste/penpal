@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { supabase } from '@/integrations/supabase/client';
+import { Json } from '@/integrations/supabase/types';
 
 interface SecretResponse {
   value: string;
@@ -12,8 +13,8 @@ const getOpenAIKey = async () => {
   
   if (error) throw error;
   
-  // Type assertion to ensure data matches our expected interface
-  const secretData = data as SecretResponse;
+  // First cast to unknown, then to our expected interface
+  const secretData = (data as unknown) as SecretResponse;
   if (!secretData || !secretData.value) {
     throw new Error('OpenAI API key not found or invalid');
   }
