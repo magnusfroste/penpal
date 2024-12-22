@@ -31,7 +31,12 @@ const getOpenAIKey = async () => {
     // Extract the value from the response
     const secretValue = (data as { value: string }).value;
 
-    if (!secretValue || typeof secretValue !== 'string') {
+    if (!secretValue) {
+      console.error('API key is empty');
+      throw new Error('OpenAI API key is not set. Please add your API key in the Supabase secrets.');
+    }
+
+    if (typeof secretValue !== 'string') {
       console.error('API key value is invalid:', secretValue);
       throw new Error('Invalid API key format. The API key must be a non-empty string.');
     }
