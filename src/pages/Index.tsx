@@ -11,6 +11,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [threadId, setThreadId] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [initError, setInitError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -18,12 +19,12 @@ const Index = () => {
     const initThread = async () => {
       try {
         setIsInitializing(true);
+        setInitError(null);
         console.log('Starting thread initialization...');
         const thread = await createThread();
         console.log('Thread created successfully:', thread.id);
         setThreadId(thread.id);
         
-        // Add initial welcome message
         setMessages([{
           role: 'assistant',
           content: 'Hello! I\'m ready to analyze your handwriting. Please upload a clear image of your handwriting sample.'
@@ -31,9 +32,11 @@ const Index = () => {
         
       } catch (error) {
         console.error('Thread initialization error:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        setInitError(errorMessage);
         toast({
           title: "Initialization Error",
-          description: "Failed to start chat. Please refresh the page or check your connection.",
+          description: errorMessage,
           variant: "destructive"
         });
       } finally {
@@ -118,6 +121,12 @@ const Index = () => {
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-primary mb-2">Handwriting Analysis Assistant</h1>
           <p className="text-muted-foreground">Upload your handwriting sample for analysis and personalized practice sheets</p>
+          {initError && (
+            <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-md">
+              <p className="font-semibold">Error initializing chat:</p>
+              <p className="text-sm">{initError}</p>
+            </div>
+          )}
         </div>
 
         <ChatInterface messages={messages} />

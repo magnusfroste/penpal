@@ -9,44 +9,57 @@ interface SecretResponse {
 const ASSISTANT_ID = 'asst_OBHVa19qPFsuQpBwX9ai6daM';
 
 const getOpenAIKey = async () => {
-  console.log('Fetching OpenAI API key...');
-  const { data, error } = await supabase.rpc('get_secret', {
-    secret_name: 'OPENAI_API_KEY'
-  });
+  console.log('Starting OpenAI API key retrieval...');
   
-  if (error) {
-    console.error('Error fetching OpenAI API key:', error);
-    throw new Error('Failed to fetch OpenAI API key: ' + error.message);
-  }
-  
-  if (!data) {
-    console.error('No data returned when fetching OpenAI API key');
-    throw new Error('No API key found. Please set your OpenAI API key in Supabase secrets.');
-  }
+  try {
+    const { data, error } = await supabase.rpc('get_secret', {
+      secret_name: 'OPENAI_API_KEY'
+    });
+    
+    console.log('Supabase response:', { data, error });
+    
+    if (error) {
+      console.error('Error fetching OpenAI API key:', error);
+      throw new Error('Failed to fetch OpenAI API key: ' + error.message);
+    }
+    
+    if (!data) {
+      console.error('No data returned from Supabase');
+      throw new Error('No API key found. Please check if OPENAI_API_KEY is set in Supabase secrets.');
+    }
 
-  // Cast the data to our expected type
-  const secretData = data as unknown as SecretResponse;
-  
-  if (!secretData.value) {
-    console.error('API key value is empty or undefined');
-    throw new Error('Invalid API key format. Please check your OpenAI API key in Supabase secrets.');
+    // Cast the data to our expected type
+    const secretData = data as unknown as SecretResponse;
+    
+    if (!secretData.value) {
+      console.error('API key value is empty or undefined:', secretData);
+      throw new Error('Invalid API key format in Supabase secrets.');
+    }
+    
+    console.log('API key retrieved successfully (length):', secretData.value.length);
+    return secretData.value;
+  } catch (error) {
+    console.error('Unexpected error in getOpenAIKey:', error);
+    throw error;
   }
-  
-  console.log('API key retrieved successfully');
-  return secretData.value;
 };
 
 export const createThread = async () => {
   try {
     console.log('Starting thread creation...');
     const apiKey = await getOpenAIKey();
-    console.log('API key retrieved successfully');
     
+    if (!apiKey) {
+      throw new Error('Failed to retrieve OpenAI API key');
+    }
+    
+    console.log('Initializing OpenAI client...');
     const openai = new OpenAI({
       apiKey,
       dangerouslyAllowBrowser: true
     });
 
+    console.log('Creating thread...');
     const thread = await openai.beta.threads.create();
     console.log('Thread created successfully:', thread.id);
     return thread;
