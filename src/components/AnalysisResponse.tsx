@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
-import { Check, Info, AlertTriangle } from "lucide-react";
+import { Check, Info, AlertTriangle, Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Analysis {
   strengths: string[];
@@ -35,6 +36,12 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
       }
     });
   }
+
+  const handlePlayTip = (tip: string) => {
+    // For now, we'll just log the tip. In a future implementation,
+    // this could trigger text-to-speech or an animation
+    console.log('Playing tip:', tip);
+  };
 
   return (
     <div className="w-full space-y-6">
@@ -87,9 +94,19 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
           </h3>
           <ul className="space-y-2">
             {analysis.tips.map((point, index) => (
-              <li key={index} className="flex items-start gap-2 text-blue-800">
-                <span className="mt-1">•</span>
-                {point}
+              <li key={index} className="flex items-center justify-between gap-2 text-blue-800">
+                <div className="flex items-start gap-2">
+                  <span className="mt-1">•</span>
+                  {point}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-blue-700 hover:text-blue-800 hover:bg-blue-100"
+                  onClick={() => handlePlayTip(point)}
+                >
+                  <Play className="h-4 w-4" />
+                </Button>
               </li>
             ))}
           </ul>
