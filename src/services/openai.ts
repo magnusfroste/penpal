@@ -16,7 +16,7 @@ const getOpenAIKey = async () => {
       secret_name: 'OPENAI_API_KEY'
     });
     
-    console.log('Raw Supabase response:', data);
+    console.log('Raw Supabase response:', JSON.stringify(data, null, 2));
     
     if (error) {
       console.error('Error fetching OpenAI API key:', error);
@@ -28,9 +28,10 @@ const getOpenAIKey = async () => {
       throw new Error('No API key found. Please check if OPENAI_API_KEY is set in Supabase secrets.');
     }
 
-    // Parse the response as SecretResponse type
-    const secretResponse = data as SecretResponse;
-    const secretValue = secretResponse.value;
+    // Safely type cast the response
+    const secretValue = (data as any).value;
+    console.log('Extracted secret value type:', typeof secretValue);
+    console.log('Secret value length:', secretValue?.length || 0);
 
     if (!secretValue) {
       console.error('API key is empty');
