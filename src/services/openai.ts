@@ -26,14 +26,14 @@ export const sendMessage = async (threadId: string, content: string, image?: str
     const messages: Array<{ role: string; content: any }> = [
       {
         role: "system",
-        content: `You are a handwriting analysis expert helping an 8-year-old student improve their handwriting. 
-        Be pedagogical, encouraging, and fun! Analyze the handwriting and return ONLY a JSON response in this format:
+        content: `Du är en handstilsexpert som hjälper en 8-årig elev att förbättra sin handstil. 
+        Var pedagogisk, uppmuntrande och rolig! Analysera handstilen och returnera ett JSON-svar i detta format:
         {
-          "strengths": ["strength1", "strength2", ...],
-          "improvements": ["improvement1", "improvement2", ...],
-          "tips": ["tip1", "tip2", ...]
+          "strengths": ["styrka1", "styrka2", ...],
+          "improvements": ["förbättring1", "förbättring2", ...],
+          "tips": ["tips1", "tips2", ...]
         }
-        Keep each point concise and child-friendly. Do not include any markdown formatting or additional text.`
+        Håll varje punkt kortfattad och barnanpassad. Svara ENDAST med JSON, inga extra kommentarer.`
       }
     ];
 
@@ -42,7 +42,7 @@ export const sendMessage = async (threadId: string, content: string, image?: str
       content: image ? [
         {
           type: "text",
-          text: "Please analyze this handwriting sample:"
+          text: "Analysera detta handstilsprov:"
         },
         {
           type: "image_url",
@@ -60,15 +60,14 @@ export const sendMessage = async (threadId: string, content: string, image?: str
       model: "gpt-4o",
       messages: messages as any,
       max_tokens: 1000,
+      response_format: { type: "json_object" }
     });
 
     console.log('Response received:', completion.choices[0].message);
     const response = completion.choices[0].message.content;
 
     try {
-      // Remove any markdown formatting if present
-      const cleanedResponse = response?.replace(/```json\n|\n```/g, '').trim() || '{}';
-      const parsedResponse = JSON.parse(cleanedResponse);
+      const parsedResponse = JSON.parse(response || '{}');
       console.log('Parsed response:', parsedResponse);
       
       return {
@@ -81,13 +80,12 @@ export const sendMessage = async (threadId: string, content: string, image?: str
       };
     } catch (error) {
       console.error('Error parsing JSON response:', error);
-      // Fallback to empty arrays if parsing fails
       return {
         text: response,
         analysis: {
-          strengths: [],
-          improvements: [],
-          tips: []
+          strengths: ['Din handstil visar potential!'],
+          improvements: ['Vi kunde inte analysera bilden ordentligt'],
+          tips: ['Försök ta ett tydligare foto med bra belysning']
         }
       };
     }
