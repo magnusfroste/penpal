@@ -28,16 +28,8 @@ const getOpenAIKey = async () => {
       throw new Error('No API key found. Please check if OPENAI_API_KEY is set in Supabase secrets.');
     }
 
-    // Handle the case where data might be a string
-    let secretValue: string;
-    if (typeof data === 'string') {
-      secretValue = data;
-    } else if (typeof data === 'object' && 'value' in data) {
-      secretValue = (data as SecretResponse).value;
-    } else {
-      console.error('Unexpected data format:', data);
-      throw new Error('Invalid API key format. Please check the format of your OpenAI API key in Supabase secrets.');
-    }
+    // Extract the value from the response
+    const secretValue = (data as { value: string }).value;
 
     if (!secretValue || typeof secretValue !== 'string') {
       console.error('API key value is invalid:', secretValue);
