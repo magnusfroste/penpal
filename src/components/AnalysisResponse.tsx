@@ -46,6 +46,7 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
 
   return (
     <div className="w-full space-y-6">
+      {/* Image is now always shown, regardless of thinking state */}
       {message.image && (
         <Card className="p-4">
           <h3 className="text-lg font-semibold mb-2">Din handstil</h3>
