@@ -16,7 +16,7 @@ const getOpenAIKey = async () => {
       secret_name: 'OPENAI_API_KEY'
     });
     
-    console.log('Supabase response:', { data, error });
+    console.log('Raw Supabase response:', data);
     
     if (error) {
       console.error('Error fetching OpenAI API key:', error);
@@ -28,16 +28,30 @@ const getOpenAIKey = async () => {
       throw new Error('No API key found. Please check if OPENAI_API_KEY is set in Supabase secrets.');
     }
 
-    // Cast the data to our expected type
-    const secretData = data as unknown as SecretResponse;
-    
-    if (!secretData.value) {
-      console.error('API key value is empty or undefined:', secretData);
-      throw new Error('Invalid API key format in Supabase secrets.');
+    // Handle the case where data might be a string
+    let secretValue: string;
+    if (typeof data === 'string') {
+      secretValue = data;
+    } else if (typeof data === 'object' && 'value' in data) {
+      secretValue = (data as SecretResponse).value;
+    } else {
+      console.error('Unexpected data format:', data);
+      throw new Error('Invalid API key format. Please check the format of your OpenAI API key in Supabase secrets.');
+    }
+
+    if (!secretValue || typeof secretValue !== 'string') {
+      console.error('API key value is invalid:', secretValue);
+      throw new Error('Invalid API key format. The API key must be a non-empty string.');
+    }
+
+    // Validate that it looks like an OpenAI key (starts with 'sk-')
+    if (!secretValue.startsWith('sk-')) {
+      console.error('API key does not match expected format (should start with sk-)');
+      throw new Error('Invalid OpenAI API key format. The key should start with "sk-"');
     }
     
-    console.log('API key retrieved successfully (length):', secretData.value.length);
-    return secretData.value;
+    console.log('API key retrieved successfully (length):', secretValue.length);
+    return secretValue;
   } catch (error) {
     console.error('Unexpected error in getOpenAIKey:', error);
     throw error;
