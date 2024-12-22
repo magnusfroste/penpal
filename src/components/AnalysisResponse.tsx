@@ -1,0 +1,104 @@
+import React from 'react';
+import { Card } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Check, Info, AlertTriangle } from "lucide-react";
+
+interface AnalysisPoint {
+  type: 'strength' | 'improvement' | 'tip';
+  content: string;
+}
+
+interface AnalysisResponseProps {
+  message: {
+    content: string;
+    image?: string;
+  };
+}
+
+const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
+  // Parse the content into structured points
+  const parseContent = (content: string): AnalysisPoint[] => {
+    const lines = content.split('\n').filter(line => line.trim());
+    return lines.map(line => {
+      if (line.toLowerCase().includes('strength') || line.toLowerCase().includes('positive')) {
+        return { type: 'strength', content: line };
+      } else if (line.toLowerCase().includes('improve') || line.toLowerCase().includes('work on')) {
+        return { type: 'improvement', content: line };
+      } else {
+        return { type: 'tip', content: line };
+      }
+    });
+  };
+
+  const analysisPoints = parseContent(message.content);
+
+  return (
+    <ScrollArea className="h-[500px] w-full rounded-md border p-4">
+      {message.image && (
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold mb-2">Din handstil</h3>
+          <img
+            src={message.image}
+            alt="Handskriftsprov"
+            className="max-w-sm rounded-lg shadow-lg mx-auto"
+          />
+        </div>
+      )}
+      
+      <div className="space-y-6">
+        <Card className="p-4 bg-gradient-to-r from-green-50 to-green-100">
+          <h3 className="text-lg font-semibold flex items-center gap-2 text-green-700 mb-3">
+            <Check className="h-5 w-5" />
+            Styrkor
+          </h3>
+          <ul className="space-y-2">
+            {analysisPoints
+              .filter(point => point.type === 'strength')
+              .map((point, index) => (
+                <li key={index} className="flex items-start gap-2 text-green-800">
+                  <span className="mt-1">•</span>
+                  {point.content}
+                </li>
+              ))}
+          </ul>
+        </Card>
+
+        <Card className="p-4 bg-gradient-to-r from-amber-50 to-amber-100">
+          <h3 className="text-lg font-semibold flex items-center gap-2 text-amber-700 mb-3">
+            <AlertTriangle className="h-5 w-5" />
+            Förbättringsområden
+          </h3>
+          <ul className="space-y-2">
+            {analysisPoints
+              .filter(point => point.type === 'improvement')
+              .map((point, index) => (
+                <li key={index} className="flex items-start gap-2 text-amber-800">
+                  <span className="mt-1">•</span>
+                  {point.content}
+                </li>
+              ))}
+          </ul>
+        </Card>
+
+        <Card className="p-4 bg-gradient-to-r from-blue-50 to-blue-100">
+          <h3 className="text-lg font-semibold flex items-center gap-2 text-blue-700 mb-3">
+            <Info className="h-5 w-5" />
+            Tips och övningar
+          </h3>
+          <ul className="space-y-2">
+            {analysisPoints
+              .filter(point => point.type === 'tip')
+              .map((point, index) => (
+                <li key={index} className="flex items-start gap-2 text-blue-800">
+                  <span className="mt-1">•</span>
+                  {point.content}
+                </li>
+              ))}
+          </ul>
+        </Card>
+      </div>
+    </ScrollArea>
+  );
+};
+
+export default AnalysisResponse;

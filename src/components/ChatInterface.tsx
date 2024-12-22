@@ -1,4 +1,5 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
+import AnalysisResponse from "./AnalysisResponse";
 
 interface Message {
   role: string;
@@ -11,6 +12,17 @@ interface ChatInterfaceProps {
 }
 
 export const ChatInterface = ({ messages }: ChatInterfaceProps) => {
+  const lastAssistantMessage = messages.findLast(m => m.role === 'assistant');
+  const userMessage = messages.findLast(m => m.role === 'user');
+
+  if (!messages.length) {
+    return null;
+  }
+
+  if (lastAssistantMessage && userMessage) {
+    return <AnalysisResponse message={lastAssistantMessage} />;
+  }
+
   return (
     <ScrollArea className="h-[400px] rounded-md border p-4">
       <div className="chat-container">
@@ -24,7 +36,7 @@ export const ChatInterface = ({ messages }: ChatInterfaceProps) => {
             {message.image && (
               <img
                 src={message.image}
-                alt="Handwriting sample"
+                alt="Handskriftsprov"
                 className="image-preview mb-2"
               />
             )}
