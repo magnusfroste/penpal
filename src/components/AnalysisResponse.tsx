@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Check, Info, AlertTriangle, Loader2, Star, PenTool, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import HandwritingExerciseSheet from './HandwritingExerciseSheet';
+import { createRoot } from 'react-dom/client';
 
 interface Analysis {
   strengths: string[];
@@ -52,30 +53,25 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
     printContent.style.left = '-9999px';
     document.body.appendChild(printContent);
 
-    const exerciseSheet = document.createElement('div');
-    exerciseSheet.innerHTML = `
-      <style>
-        @media print {
-          body { margin: 0; padding: 20px; }
-          .exercise-page { page-break-after: always; }
-        }
-      </style>
-    `;
+    // Create a root for React to render into
+    const root = createRoot(printContent);
     
-    // Render the exercise sheet component
-    const ReactDOM = require('react-dom');
-    ReactDOM.render(
+    // Render the exercise sheet
+    root.render(
       <HandwritingExerciseSheet
         practiceLetters={analysis.practiceLetters}
         improvements={analysis.improvements}
         tips={analysis.tips}
-      />,
-      exerciseSheet
+      />
     );
-    
-    printContent.appendChild(exerciseSheet);
-    window.print();
-    document.body.removeChild(printContent);
+
+    // Wait a moment for the content to render
+    setTimeout(() => {
+      window.print();
+      // Cleanup
+      root.unmount();
+      document.body.removeChild(printContent);
+    }, 100);
   };
 
   return (
