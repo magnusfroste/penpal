@@ -8,6 +8,8 @@ interface Message {
     strengths: string[];
     improvements: string[];
     tips: string[];
+    perfectLetters: string[];
+    practiceLetters: string[];
   };
 }
 
