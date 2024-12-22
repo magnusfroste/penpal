@@ -25,11 +25,19 @@ export const sendMessage = async (threadId: string, content: string, image?: str
 
   try {
     // Add the message to the thread
-    await openai.beta.threads.messages.create(threadId, {
+    const messageParams: OpenAI.Beta.Threads.MessageCreateParams = {
       role: 'user',
       content: content,
-      file_ids: image ? [image] : undefined
-    });
+    };
+
+    // If an image is provided, we'll need to handle file upload first
+    if (image) {
+      // Note: This is a placeholder. You'll need to implement actual file upload logic
+      // This might involve uploading the file to OpenAI and getting a file ID
+      // messageParams.file_ids = [uploadedFileId];
+    }
+
+    await openai.beta.threads.messages.create(threadId, messageParams);
 
     // Run the assistant
     const run = await openai.beta.threads.runs.create(threadId, {
