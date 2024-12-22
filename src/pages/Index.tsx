@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, Camera } from "lucide-react";
 import { ChatInterface } from '@/components/ChatInterface';
 import { createThread, sendMessage } from '@/services/openai';
@@ -18,15 +18,22 @@ const Index = () => {
     const initThread = async () => {
       try {
         setIsInitializing(true);
-        console.log('Initializing thread...');
+        console.log('Starting thread initialization...');
         const thread = await createThread();
-        console.log('Thread initialized:', thread.id);
+        console.log('Thread created successfully:', thread.id);
         setThreadId(thread.id);
+        
+        // Add initial welcome message
+        setMessages([{
+          role: 'assistant',
+          content: 'Hello! I\'m ready to analyze your handwriting. Please upload a clear image of your handwriting sample.'
+        }]);
+        
       } catch (error) {
         console.error('Thread initialization error:', error);
         toast({
-          title: "Error",
-          description: "Failed to initialize chat. Please check your API key and try again.",
+          title: "Initialization Error",
+          description: "Failed to start chat. Please refresh the page or check your connection.",
           variant: "destructive"
         });
       } finally {
@@ -52,8 +59,8 @@ const Index = () => {
 
     if (!threadId) {
       toast({
-        title: "Error",
-        description: "Chat not initialized. Please wait a moment and try again.",
+        title: "Chat not ready",
+        description: "Please wait for the chat to initialize and try again.",
         variant: "destructive"
       });
       return;
@@ -63,7 +70,6 @@ const Index = () => {
       setIsLoading(true);
       const base64Image = await convertToBase64(file);
       
-      // Add the image message to the chat
       const userMessage = {
         role: 'user',
         content: 'Here is my handwriting sample:',
@@ -72,7 +78,6 @@ const Index = () => {
       
       setMessages(prev => [...prev, userMessage]);
 
-      // Send the message to the assistant
       const response = await sendMessage(threadId, userMessage.content, base64Image);
       
       setMessages(prev => [...prev, {
@@ -132,12 +137,14 @@ const Index = () => {
             disabled={isLoading || isInitializing}
             className="gap-2"
           >
-            {isLoading ? (
+            {isInitializing ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <Camera className="h-4 w-4" />
             )}
-            Take Photo
+            {isInitializing ? 'Initializing...' : 'Take Photo'}
           </Button>
 
           <Button
