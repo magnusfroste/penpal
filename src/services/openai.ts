@@ -45,7 +45,7 @@ export const sendMessage = async (threadId: string, content: string, image?: str
     let messageContent: any[] = [
       {
         type: 'text',
-        text: `${content}\n\nPlease provide your analysis in JSON format.` // Added JSON mention
+        text: content
       }
     ];
 
@@ -67,13 +67,12 @@ export const sendMessage = async (threadId: string, content: string, image?: str
 
       console.log('File uploaded successfully:', uploadedFile.id);
       
-      // Update assistant with code interpreter and the new file
       await openai.beta.assistants.update(
         ASSISTANT_ID,
         {
           tools: [{ type: "code_interpreter" }],
           file_ids: [uploadedFile.id]
-        } as any // Using type assertion as a temporary fix
+        } as any
       );
 
       messageContent.push({
@@ -91,14 +90,7 @@ export const sendMessage = async (threadId: string, content: string, image?: str
 
     console.log('Starting assistant run...');
     const run = await openai.beta.threads.runs.create(threadId, {
-      assistant_id: ASSISTANT_ID,
-      instructions: `Please analyze the handwriting sample and provide your analysis in JSON format with the following structure:
-      {
-        "strengths": ["strength1", "strength2", ...],
-        "improvements": ["improvement1", "improvement2", ...],
-        "tips": ["tip1", "tip2", ...]
-      }`,
-      response_format: { type: "json_object" } // Added response format specification
+      assistant_id: ASSISTANT_ID
     });
 
     let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
