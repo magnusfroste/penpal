@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, Camera } from "lucide-react";
 import { ChatInterface } from '@/components/ChatInterface';
 import { createThread, sendMessage } from '@/services/openai';
+import Footer from '@/components/Footer';
 
 const Index = () => {
   const [messages, setMessages] = useState<Array<{ role: string; content: string; image?: string; analysis?: any }>>([]);
@@ -115,58 +116,61 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <Card className="max-w-4xl mx-auto p-6">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-primary mb-2">Handstilsanalys</h1>
-          <p className="text-muted-foreground mb-6">Ladda upp ett prov på din handstil för analys och personliga övningsblad</p>
-          
-          <div className="flex gap-4 justify-center mb-8">
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleFileUpload}
-              ref={fileInputRef}
-              className="hidden"
-            />
+    <div className="min-h-screen bg-background p-4 flex flex-col">
+      <div className="flex-grow">
+        <Card className="max-w-4xl mx-auto p-6">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-primary mb-2">Handstilsanalys</h1>
+            <p className="text-muted-foreground mb-6">Ladda upp ett prov på din handstil för analys och personliga övningsblad</p>
             
-            <Button
-              onClick={handleCameraClick}
-              disabled={isLoading || isInitializing}
-              className="gap-2"
-            >
-              {isInitializing ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Camera className="h-4 w-4" />
-              )}
-              {isInitializing ? 'Initierar...' : 'Ta foto'}
-            </Button>
+            <div className="flex gap-4 justify-center mb-8">
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handleFileUpload}
+                ref={fileInputRef}
+                className="hidden"
+              />
+              
+              <Button
+                onClick={handleCameraClick}
+                disabled={isLoading || isInitializing}
+                className="gap-2"
+              >
+                {isInitializing ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Camera className="h-4 w-4" />
+                )}
+                {isInitializing ? 'Initierar...' : 'Ta foto'}
+              </Button>
 
-            <Button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isLoading || isInitializing}
-              variant="outline"
-              className="gap-2"
-            >
-              <Upload className="h-4 w-4" />
-              Ladda upp bild
-            </Button>
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isLoading || isInitializing}
+                variant="outline"
+                className="gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                Ladda upp bild
+              </Button>
+            </div>
+
+            {initError && (
+              <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-md">
+                <p className="font-semibold">Ett fel uppstod vid initiering:</p>
+                <p className="text-sm">{initError}</p>
+              </div>
+            )}
           </div>
 
-          {initError && (
-            <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-md">
-              <p className="font-semibold">Ett fel uppstod vid initiering:</p>
-              <p className="text-sm">{initError}</p>
-            </div>
-          )}
-        </div>
-
-        <ChatInterface messages={messages} />
-      </Card>
+          <ChatInterface messages={messages} />
+        </Card>
+      </div>
+      <Footer />
     </div>
   );
 };
