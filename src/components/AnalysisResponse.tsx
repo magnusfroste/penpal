@@ -47,14 +47,14 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
   return (
     <div className="w-full space-y-6">
       {message.image && (
-        <div className="mb-6">
+        <Card className="p-4">
           <h3 className="text-lg font-semibold mb-2">Din handstil</h3>
           <img
             src={message.image}
             alt="Handskriftsprov"
-            className="max-w-sm rounded-lg shadow-lg mx-auto"
+            className="rounded-lg shadow-lg mx-auto max-h-[300px] object-contain"
           />
-        </div>
+        </Card>
       )}
       
       {isThinking ? (
