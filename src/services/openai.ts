@@ -12,6 +12,7 @@ const getOpenAIKey = async () => {
   console.log('Starting OpenAI API key retrieval...');
   
   try {
+    // Call the get_secret function with the correct parameter format
     const { data, error } = await supabase.rpc('get_secret', {
       secret_name: 'OPENAI_API_KEY'
     });
@@ -28,28 +29,17 @@ const getOpenAIKey = async () => {
       throw new Error('No API key found. Please check if OPENAI_API_KEY is set in Supabase secrets.');
     }
 
-    // Safely type cast the response
-    const secretValue = (data as any).value;
-    console.log('Extracted secret value type:', typeof secretValue);
-    console.log('Secret value length:', secretValue?.length || 0);
+    // The secret value is stored in current_setting('app.settings.OPENAI_API_KEY')
+    // We need to access it through the get_secret function which returns it in the 'value' field
+    const secretValue = data.value;
+    console.log('Secret value type:', typeof secretValue);
+    console.log('Secret value exists:', !!secretValue);
 
     if (!secretValue) {
       console.error('API key is empty');
       throw new Error('OpenAI API key is not set. Please add your API key in the Supabase secrets.');
     }
 
-    if (typeof secretValue !== 'string') {
-      console.error('API key value is invalid:', secretValue);
-      throw new Error('Invalid API key format. The API key must be a non-empty string.');
-    }
-
-    // Validate that it looks like an OpenAI key (starts with 'sk-')
-    if (!secretValue.startsWith('sk-')) {
-      console.error('API key does not match expected format (should start with sk-)');
-      throw new Error('Invalid OpenAI API key format. The key should start with "sk-"');
-    }
-    
-    console.log('API key retrieved successfully (length):', secretValue.length);
     return secretValue;
   } catch (error) {
     console.error('Unexpected error in getOpenAIKey:', error);
