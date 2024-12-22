@@ -29,7 +29,9 @@ const getOpenAIKey = async () => {
     }
 
     // Extract the value from the response
-    const secretValue = (data as { value: string }).value;
+    const secretValue = data.value;
+    console.log('API key value type:', typeof secretValue);
+    console.log('API key length:', secretValue?.length);
 
     if (!secretValue) {
       console.error('API key is empty');
