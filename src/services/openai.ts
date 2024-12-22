@@ -42,7 +42,7 @@ export const sendMessage = async (threadId: string, content: string, image?: str
       dangerouslyAllowBrowser: true
     });
 
-    let fileId: string | undefined;
+    let messageContent = content;
 
     if (image) {
       console.log('Processing image upload...');
@@ -53,7 +53,6 @@ export const sendMessage = async (threadId: string, content: string, image?: str
         array[i] = binaryData.charCodeAt(i);
       }
       const blob = new Blob([array], { type: 'image/jpeg' });
-
       const file = new File([blob], 'handwriting.jpg', { type: 'image/jpeg' });
 
       const uploadedFile = await openai.files.create({
@@ -61,21 +60,27 @@ export const sendMessage = async (threadId: string, content: string, image?: str
         purpose: 'assistants',
       });
 
-      fileId = uploadedFile.id;
-      console.log('File uploaded successfully:', fileId);
+      console.log('File uploaded successfully:', uploadedFile.id);
+      
+      // Create message with file reference
+      await openai.beta.threads.messages.create(threadId, {
+        role: 'user',
+        content: messageContent,
+      });
+
+      // Add the file to the message separately
+      await openai.beta.threads.messages.create(threadId, {
+        role: 'user',
+        content: '',
+        file_ids: [uploadedFile.id]
+      });
+    } else {
+      // Send message without file
+      await openai.beta.threads.messages.create(threadId, {
+        role: 'user',
+        content: messageContent,
+      });
     }
-
-    const messageParams: any = {
-      role: 'user',
-      content: content,
-    };
-
-    if (fileId) {
-      messageParams.file_ids = [fileId];
-    }
-
-    console.log('Sending message with params:', messageParams);
-    await openai.beta.threads.messages.create(threadId, messageParams);
 
     console.log('Starting assistant run...');
     const run = await openai.beta.threads.runs.create(threadId, {
