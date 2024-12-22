@@ -11,11 +11,15 @@ const getOpenAIKey = async () => {
     secret_name: 'OPENAI_API_KEY'
   });
   
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching OpenAI API key:', error);
+    throw error;
+  }
   
   // First cast to unknown, then to our expected interface
   const secretData = (data as unknown) as SecretResponse;
   if (!secretData || !secretData.value) {
+    console.error('OpenAI API key not found or invalid');
     throw new Error('OpenAI API key not found or invalid');
   }
   
@@ -25,33 +29,38 @@ const getOpenAIKey = async () => {
 const ASSISTANT_ID = 'asst_OBHVa19qPFsuQpBwX9ai6daM';
 
 export const createThread = async () => {
-  const apiKey = await getOpenAIKey();
-  const openai = new OpenAI({
-    apiKey,
-    dangerouslyAllowBrowser: true
-  });
-
   try {
+    console.log('Starting thread creation...');
+    const apiKey = await getOpenAIKey();
+    console.log('API key retrieved successfully');
+    
+    const openai = new OpenAI({
+      apiKey,
+      dangerouslyAllowBrowser: true
+    });
+
     const thread = await openai.beta.threads.create();
+    console.log('Thread created successfully:', thread.id);
     return thread;
   } catch (error) {
-    console.error('Error creating thread:', error);
+    console.error('Error in createThread:', error);
     throw error;
   }
 };
 
 export const sendMessage = async (threadId: string, content: string, image?: string) => {
-  const apiKey = await getOpenAIKey();
-  const openai = new OpenAI({
-    apiKey,
-    dangerouslyAllowBrowser: true
-  });
-
   try {
+    console.log('Starting to send message to thread:', threadId);
+    const apiKey = await getOpenAIKey();
+    const openai = new OpenAI({
+      apiKey,
+      dangerouslyAllowBrowser: true
+    });
+
     let fileId: string | undefined;
 
-    // If an image is provided, upload it first
     if (image) {
+      console.log('Processing image upload...');
       // Convert base64 to blob
       const base64Data = image.split(',')[1];
       const binaryData = atob(base64Data);
@@ -71,6 +80,7 @@ export const sendMessage = async (threadId: string, content: string, image?: str
       });
 
       fileId = uploadedFile.id;
+      console.log('File uploaded successfully:', fileId);
     }
 
     // Add the message to the thread
@@ -83,9 +93,11 @@ export const sendMessage = async (threadId: string, content: string, image?: str
       messageParams.file_ids = [fileId];
     }
 
+    console.log('Sending message with params:', messageParams);
     await openai.beta.threads.messages.create(threadId, messageParams);
 
     // Run the assistant
+    console.log('Starting assistant run...');
     const run = await openai.beta.threads.runs.create(threadId, {
       assistant_id: ASSISTANT_ID
     });
@@ -95,8 +107,10 @@ export const sendMessage = async (threadId: string, content: string, image?: str
     while (runStatus.status !== 'completed') {
       await new Promise(resolve => setTimeout(resolve, 1000));
       runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
+      console.log('Current run status:', runStatus.status);
       
       if (runStatus.status === 'failed') {
+        console.error('Assistant run failed:', runStatus);
         throw new Error('Assistant run failed');
       }
     }
@@ -107,12 +121,14 @@ export const sendMessage = async (threadId: string, content: string, image?: str
     
     // Extract text content from the response
     if (lastMessage.type === 'text') {
+      console.log('Response received successfully');
       return { text: lastMessage.text.value };
     } else {
+      console.log('Non-text response received');
       return { text: 'I received your image but can only respond with text messages.' };
     }
   } catch (error) {
-    console.error('Error sending message:', error);
+    console.error('Error in sendMessage:', error);
     throw error;
   }
 };

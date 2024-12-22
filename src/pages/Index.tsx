@@ -10,20 +10,27 @@ const Index = () => {
   const [messages, setMessages] = useState<Array<{ role: string; content: string; image?: string }>>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [threadId, setThreadId] = useState<string | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     const initThread = async () => {
       try {
+        setIsInitializing(true);
+        console.log('Initializing thread...');
         const thread = await createThread();
+        console.log('Thread initialized:', thread.id);
         setThreadId(thread.id);
       } catch (error) {
+        console.error('Thread initialization error:', error);
         toast({
           title: "Error",
-          description: "Failed to initialize chat. Please check your API key.",
+          description: "Failed to initialize chat. Please check your API key and try again.",
           variant: "destructive"
         });
+      } finally {
+        setIsInitializing(false);
       }
     };
 
@@ -46,7 +53,7 @@ const Index = () => {
     if (!threadId) {
       toast({
         title: "Error",
-        description: "Chat not initialized. Please try again.",
+        description: "Chat not initialized. Please wait a moment and try again.",
         variant: "destructive"
       });
       return;
@@ -74,6 +81,7 @@ const Index = () => {
       }]);
 
     } catch (error) {
+      console.error('File upload error:', error);
       toast({
         title: "Error",
         description: "Failed to process image. Please try again.",
@@ -121,7 +129,7 @@ const Index = () => {
           
           <Button
             onClick={handleCameraClick}
-            disabled={isLoading}
+            disabled={isLoading || isInitializing}
             className="gap-2"
           >
             {isLoading ? (
@@ -134,7 +142,7 @@ const Index = () => {
 
           <Button
             onClick={() => fileInputRef.current?.click()}
-            disabled={isLoading}
+            disabled={isLoading || isInitializing}
             variant="outline"
             className="gap-2"
           >
