@@ -108,16 +108,16 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
             </Card>
 
             <Card className="p-4 bg-gradient-to-r from-purple-50 to-purple-100">
-              <Button
-                variant="ghost"
-                className="w-full text-left p-0 h-auto hover:bg-transparent"
+              <div 
+                role="button"
+                className="cursor-pointer w-full"
                 onClick={() => setShowImage(!showImage)}
               >
                 <h3 className="text-lg font-semibold flex items-center gap-2 text-purple-700 mb-3">
                   <PenTool className="h-5 w-5" />
                   Bokstäver att öva på
                 </h3>
-              </Button>
+              </div>
               <div className="flex flex-wrap mb-3">
                 {analysis.practiceLetters.map((letter, index) => (
                   <LetterBadge key={index} letter={letter} />
