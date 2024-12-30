@@ -145,7 +145,7 @@ const Index = () => {
             <div className="flex items-center justify-center gap-2 mb-3">
               <PenLine className="h-8 w-8 text-primary" />
               <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">
-                Pen Pal
+                PenPal
               </h1>
             </div>
             <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
