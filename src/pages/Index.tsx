@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, PenLine, Upload, ImagePlus } from "lucide-react";
 import { ChatInterface } from '@/components/ChatInterface';
 import { createThread, sendMessage } from '@/services/openai';
+import { Progress } from "@/components/ui/progress";
 import Footer from '@/components/Footer';
 
 const Index = () => {
@@ -13,6 +14,7 @@ const Index = () => {
   const [threadId, setThreadId] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [initError, setInitError] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -24,7 +26,7 @@ const Index = () => {
         
         const thread = await createThread();
         setThreadId(thread.id);
-        setMessages([]); // Initialize with empty messages array instead of welcome message
+        setMessages([]); 
         
       } catch (error) {
         console.error('Thread initialization error:', error);
@@ -67,6 +69,19 @@ const Index = () => {
 
     try {
       setIsLoading(true);
+      setUploadProgress(0);
+      
+      // Simulate progress during base64 conversion and API call
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 500);
+
       const base64Image = await convertToBase64(file);
       
       const userMessage = {
@@ -87,6 +102,12 @@ const Index = () => {
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+      setUploadProgress(100);
+      
+      // Clear progress after a short delay
+      setTimeout(() => {
+        setUploadProgress(0);
+      }, 1000);
       
     } catch (error) {
       console.error('File upload error:', error);
@@ -95,6 +116,7 @@ const Index = () => {
         description: "Det gick inte att analysera bilden. Försök igen.",
         variant: "destructive"
       });
+      setUploadProgress(0);
     } finally {
       setIsLoading(false);
     }
@@ -167,6 +189,15 @@ const Index = () => {
                 Välj en bild
               </Button>
             </div>
+
+            {uploadProgress > 0 && (
+              <div className="w-full max-w-md mx-auto mb-8">
+                <Progress value={uploadProgress} className="h-2" />
+                <p className="text-sm text-muted-foreground mt-2">
+                  {uploadProgress < 100 ? 'Analyserar din handstil...' : 'Analys klar!'}
+                </p>
+              </div>
+            )}
 
             {initError && (
               <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-lg border border-red-100">
