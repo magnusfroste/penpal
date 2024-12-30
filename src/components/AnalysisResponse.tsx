@@ -133,22 +133,6 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="flex justify-end mb-4">
-            <Button
-              onClick={handleDownloadPDF}
-              variant="outline"
-              className="gap-2"
-              disabled={isGeneratingPDF}
-            >
-              {isGeneratingPDF ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Download className="h-4 w-4" />
-              )}
-              {isGeneratingPDF ? 'Skapar PDF...' : 'Ladda ner övningsblad'}
-            </Button>
-          </div>
-
           <Card className="p-4 bg-gradient-to-r from-green-50 to-green-100">
             <h3 className="text-lg font-semibold flex items-center gap-2 text-green-700 mb-3">
               <Check className="h-5 w-5" />
@@ -187,7 +171,9 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
               </h3>
               <div className="flex flex-wrap">
                 {analysis.perfectLetters.map((letter, index) => (
-                  <LetterBadge key={index} letter={letter} />
+                  <span key={index} className="inline-block px-3 py-1 m-1 text-lg font-medium rounded-full bg-background border-2">
+                    {letter}
+                  </span>
                 ))}
               </div>
             </Card>
@@ -205,7 +191,9 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
               </div>
               <div className="flex flex-wrap mb-3">
                 {analysis.practiceLetters.map((letter, index) => (
-                  <LetterBadge key={index} letter={letter} />
+                  <span key={index} className="inline-block px-3 py-1 m-1 text-lg font-medium rounded-full bg-background border-2">
+                    {letter}
+                  </span>
                 ))}
               </div>
               {showImage && message.image && (
@@ -220,7 +208,7 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
             </Card>
           </div>
 
-          <div>
+          <div className="mb-8">
             <h3 className="text-lg font-semibold flex items-center gap-2 text-blue-700 mb-3">
               <Info className="h-5 w-5" />
               Tips och övningar
@@ -235,6 +223,22 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
                 </Card>
               ))}
             </div>
+          </div>
+
+          <div className="flex justify-center mt-8">
+            <Button
+              onClick={handleDownloadPDF}
+              className="gap-2 bg-gradient-to-r from-primary/90 to-blue-600/90 hover:from-primary hover:to-blue-600 text-white shadow-md transition-all duration-300"
+              size="lg"
+              disabled={isGeneratingPDF}
+            >
+              {isGeneratingPDF ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              {isGeneratingPDF ? 'Skapar PDF...' : 'Ladda ner övningsblad'}
+            </Button>
           </div>
         </div>
       )}
