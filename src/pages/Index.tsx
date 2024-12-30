@@ -149,7 +149,7 @@ const Index = () => {
               </h1>
             </div>
             <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
-              Ladda upp ett prov på din handstil och få personliga övningsblad anpassade just för dig
+              Hej penkompis, nu skall du få visa mig vad du kan! Jag är så nyfiken på hur dina krumelurer ser ut idag, är du redo att dela med dig!?
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
