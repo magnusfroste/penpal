@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Upload, Camera } from "lucide-react";
+import { Loader2, PenLine, Upload, ImagePlus } from "lucide-react";
 import { ChatInterface } from '@/components/ChatInterface';
 import { createThread, sendMessage } from '@/services/openai';
 import Footer from '@/components/Footer';
@@ -49,8 +49,8 @@ const Index = () => {
 
     if (!file.type.startsWith('image/')) {
       toast({
-        title: "Invalid file type",
-        description: "Please upload an image file",
+        title: "Ogiltig filtyp",
+        description: "Vänligen ladda upp en bildfil",
         variant: "destructive"
       });
       return;
@@ -58,8 +58,8 @@ const Index = () => {
 
     if (!threadId) {
       toast({
-        title: "Chat not ready",
-        description: "Please wait for the chat to initialize and try again.",
+        title: "Chatten är inte redo",
+        description: "Vänta tills chatten har initierats och försök igen.",
         variant: "destructive"
       });
       return;
@@ -92,7 +92,7 @@ const Index = () => {
       console.error('File upload error:', error);
       toast({
         title: "Error",
-        description: "Failed to process image. Please try again.",
+        description: "Det gick inte att analysera bilden. Försök igen.",
         variant: "destructive"
       });
     } finally {
@@ -116,14 +116,21 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 p-4 flex flex-col">
       <div className="flex-grow">
-        <Card className="max-w-4xl mx-auto p-6">
+        <Card className="max-w-4xl mx-auto p-6 bg-white/80 backdrop-blur-sm shadow-lg border border-gray-100">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-primary mb-2">Handstilsanalys</h1>
-            <p className="text-muted-foreground mb-6">Ladda upp ett prov på din handstil för analys och personliga övningsblad</p>
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <PenLine className="h-8 w-8 text-primary" />
+              <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">
+                Pen Pal
+              </h1>
+            </div>
+            <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
+              Ladda upp ett prov på din handstil och få personliga övningsblad anpassade just för dig
+            </p>
             
-            <div className="flex gap-4 justify-center mb-8">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
               <input
                 type="file"
                 accept="image/*"
@@ -136,31 +143,33 @@ const Index = () => {
               <Button
                 onClick={handleCameraClick}
                 disabled={isLoading || isInitializing}
-                className="gap-2"
+                className="w-full sm:w-auto bg-gradient-to-r from-primary/90 to-blue-600/90 hover:from-primary hover:to-blue-600 text-white shadow-md transition-all duration-300 gap-2"
+                size="lg"
               >
                 {isInitializing ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-5 w-5 animate-spin" />
                 ) : isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
-                  <Camera className="h-4 w-4" />
+                  <ImagePlus className="h-5 w-5" />
                 )}
-                {isInitializing ? 'Initierar...' : 'Ta foto'}
+                {isInitializing ? 'Initierar...' : 'Ta ett foto'}
               </Button>
 
               <Button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isLoading || isInitializing}
                 variant="outline"
-                className="gap-2"
+                className="w-full sm:w-auto border-primary/20 hover:border-primary/40 transition-all duration-300 gap-2"
+                size="lg"
               >
-                <Upload className="h-4 w-4" />
-                Ladda upp bild
+                <Upload className="h-5 w-5" />
+                Välj en bild
               </Button>
             </div>
 
             {initError && (
-              <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-md">
+              <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-lg border border-red-100">
                 <p className="font-semibold">Ett fel uppstod vid initiering:</p>
                 <p className="text-sm">{initError}</p>
               </div>
