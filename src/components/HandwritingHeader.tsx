@@ -10,7 +10,7 @@ const HandwritingHeader = () => {
         </h1>
       </div>
       <p className="text-muted-foreground mb-8 max-w-lg mx-auto text-lg">
-        <span className="font-semibold text-primary">Hej min glada penkompis! 🌟</span>
+        <span className="font-semibold text-primary">Hej min glada penn-kompis! 🌟</span>
         <br />
         Nu ska vi ha kul tillsammans! ✨ Visa mig dina finaste krumelurer - 
         jag är <span className="italic">super</span>-nyfiken på att se hur du skriver idag! 
