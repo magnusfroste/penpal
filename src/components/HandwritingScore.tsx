@@ -15,7 +15,7 @@ const HandwritingScore = ({ strengths, improvements, perfectLetters }: Handwriti
     const totalPoints = 100;
     const strengthPoints = strengths.length * 15;
     const improvementPenalty = improvements.length * 10;
-    const perfectLetterPoints = perfectLetters.length * 5;
+    const perfectLetterPoints = perfectLetters.length * 10; // Increased from 5 to 10 points
     
     let score = Math.min(strengthPoints + perfectLetterPoints - improvementPenalty, totalPoints);
     score = Math.max(score, 0); // Ensure score doesn't go below 0
@@ -78,7 +78,7 @@ const HandwritingScore = ({ strengths, improvements, perfectLetters }: Handwriti
         <p className="text-lg text-indigo-700">{achievement.message}</p>
         
         <div className="mt-4 text-sm text-indigo-600">
-          <p>Perfekta bokstäver: +{perfectLetters.length * 5} poäng</p>
+          <p>Perfekta bokstäver: +{perfectLetters.length * 10} poäng</p>
           <p>Styrkor: +{strengths.length * 15} poäng</p>
           {improvements.length > 0 && (
             <p>Förbättringsområden: -{improvements.length * 10} poäng</p>
@@ -100,7 +100,7 @@ const HandwritingScore = ({ strengths, improvements, perfectLetters }: Handwriti
                   <ul className="list-disc list-inside space-y-1">
                     <li>Varje styrka ger 15 poäng</li>
                     <li>Varje förbättringsområde drar av 10 poäng</li>
-                    <li>Varje perfekt bokstav ger 5 poäng</li>
+                    <li>Varje perfekt bokstav ger 10 poäng</li>
                     <li>Totala poängen stannar mellan 0-100</li>
                   </ul>
                 </div>
