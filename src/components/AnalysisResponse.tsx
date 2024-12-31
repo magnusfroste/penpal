@@ -1,13 +1,13 @@
 import React from 'react';
-import { Card } from "@/components/ui/card";
-import { Check, Info, AlertTriangle, Loader2, Star, PenTool, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import HandwritingExerciseSheet from './HandwritingExerciseSheet';
-import HandwritingScore from './HandwritingScore';
+import { Download, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { createRoot } from 'react-dom/client';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { useToast } from "@/hooks/use-toast";
+import HandwritingExerciseSheet from './HandwritingExerciseSheet';
+import AnalysisLoading from './analysis/AnalysisLoading';
+import AnalysisContent from './analysis/AnalysisContent';
 
 interface Analysis {
   strengths: string[];
@@ -38,14 +38,6 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
     return () => clearTimeout(timer);
   }, []);
 
-  const analysis = message.analysis || {
-    strengths: [],
-    improvements: [],
-    tips: [],
-    perfectLetters: [],
-    practiceLetters: []
-  };
-
   const handleDownloadPDF = async () => {
     try {
       setIsGeneratingPDF(true);
@@ -58,9 +50,9 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
       const root = createRoot(container);
       root.render(
         <HandwritingExerciseSheet
-          practiceLetters={analysis.practiceLetters}
-          improvements={analysis.improvements}
-          tips={analysis.tips}
+          practiceLetters={message.analysis?.practiceLetters || []}
+          improvements={message.analysis?.improvements || []}
+          tips={message.analysis?.tips || []}
         />
       );
 
@@ -100,121 +92,21 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
   };
 
   if (isThinking) {
-    return (
-      <div className="flex flex-col items-center justify-center p-12 space-y-4">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="text-lg text-muted-foreground">AI:n analyserar din handstil...</p>
-        {message.image && (
-          <Card className="p-4 mt-4">
-            <img
-              src={message.image}
-              alt="Handskriftsprov"
-              className="rounded-lg shadow-lg mx-auto max-h-[300px] object-contain"
-            />
-          </Card>
-        )}
-      </div>
-    );
+    return <AnalysisLoading image={message.image} />;
   }
+
+  const analysis = message.analysis || {
+    strengths: [],
+    improvements: [],
+    tips: [],
+    perfectLetters: [],
+    practiceLetters: []
+  };
 
   return (
     <div className="w-full space-y-6">
-      <HandwritingScore 
-        strengths={analysis.strengths}
-        improvements={analysis.improvements}
-        perfectLetters={analysis.perfectLetters}
-      />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="p-4 bg-gradient-to-r from-green-50 to-green-100">
-          <h3 className="text-lg font-semibold flex items-center gap-2 text-green-700 mb-3">
-            <Check className="h-5 w-5" />
-            Styrkor
-          </h3>
-          <ul className="space-y-2">
-            {analysis.strengths.map((point, index) => (
-              <li key={index} className="flex items-start gap-2 text-green-800">
-                <span className="mt-1">•</span>
-                {point}
-              </li>
-            ))}
-          </ul>
-        </Card>
-
-        {analysis.improvements.length > 0 && (
-          <Card className="p-4 bg-gradient-to-r from-amber-50 to-amber-100">
-            <h3 className="text-lg font-semibold flex items-center gap-2 text-amber-700 mb-3">
-              <AlertTriangle className="h-5 w-5" />
-              Förbättringsområden
-            </h3>
-            <ul className="space-y-2">
-              {analysis.improvements.map((point, index) => (
-                <li key={index} className="flex items-start gap-2 text-amber-800">
-                  <span className="mt-1">•</span>
-                  {point}
-                </li>
-              ))}
-            </ul>
-          </Card>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="p-4 bg-gradient-to-r from-blue-50 to-blue-100">
-          <h3 className="text-lg font-semibold flex items-center gap-2 text-blue-700 mb-3">
-            <Star className="h-5 w-5" />
-            Bokstäver som ser bra ut
-          </h3>
-          <div className="flex flex-wrap">
-            {analysis.perfectLetters.map((letter, index) => (
-              <span key={index} className="inline-block px-3 py-1 m-1 text-lg font-medium rounded-full bg-background border-2">
-                {letter}
-              </span>
-            ))}
-          </div>
-        </Card>
-
-        <Card className="p-4 bg-gradient-to-r from-purple-50 to-purple-100">
-          <h3 className="text-lg font-semibold flex items-center gap-2 text-purple-700 mb-3">
-            <PenTool className="h-5 w-5" />
-            Bokstäver att öva på
-          </h3>
-          <div className="flex flex-wrap mb-3">
-            {analysis.practiceLetters.map((letter, index) => (
-              <span key={index} className="inline-block px-3 py-1 m-1 text-lg font-medium rounded-full bg-background border-2">
-                {letter}
-              </span>
-            ))}
-          </div>
-          {message.image && (
-            <div className="mt-4">
-              <img
-                src={message.image}
-                alt="Handskriftsprov"
-                className="rounded-lg shadow-lg mx-auto max-h-[300px] object-contain"
-              />
-            </div>
-          )}
-        </Card>
-      </div>
-
-      <div className="mb-8">
-        <h3 className="text-lg font-semibold flex items-center gap-2 text-blue-700 mb-3">
-          <Info className="h-5 w-5" />
-          Tips och övningar
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {analysis.tips.map((point, index) => (
-            <Card 
-              key={index} 
-              className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 hover:shadow-md transition-shadow"
-            >
-              <p className="text-blue-800">{point}</p>
-            </Card>
-          ))}
-        </div>
-      </div>
-
+      <AnalysisContent analysis={analysis} image={message.image} />
+      
       <div className="flex justify-center">
         <Button
           onClick={handleDownloadPDF}
