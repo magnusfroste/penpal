@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
-import { Star, Trophy, Award, Smile, SmilePlus } from "lucide-react";
+import { Star, Trophy, Award, Smile, SmilePlus, Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface HandwritingScoreProps {
   strengths: string[];
@@ -82,6 +83,30 @@ const HandwritingScore = ({ strengths, improvements, perfectLetters }: Handwriti
           {improvements.length > 0 && (
             <p>Förbättringsområden: -{improvements.length * 10} poäng</p>
           )}
+        </div>
+
+        <div className="mt-4">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <div className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800 cursor-help">
+                  <Info className="h-4 w-4" />
+                  <span>Hur räknas poängen?</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs bg-white shadow-lg">
+                <div className="p-4 text-sm">
+                  <h4 className="font-semibold mb-2">Poängberäkning för handstil</h4>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>Varje styrka ger 15 poäng</li>
+                    <li>Varje förbättringsområde drar av 10 poäng</li>
+                    <li>Varje perfekt bokstav ger 5 poäng</li>
+                    <li>Totala poängen stannar mellan 0-100</li>
+                  </ul>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
     </Card>
