@@ -91,21 +91,13 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
     }
   };
 
-  if (isThinking) {
+  if (isThinking || !message.analysis) {
     return <AnalysisLoading image={message.image} />;
   }
 
-  const analysis = message.analysis || {
-    strengths: [],
-    improvements: [],
-    tips: [],
-    perfectLetters: [],
-    practiceLetters: []
-  };
-
   return (
     <div className="w-full space-y-6">
-      <AnalysisContent analysis={analysis} image={message.image} />
+      <AnalysisContent analysis={message.analysis} image={message.image} />
       
       <div className="flex justify-center">
         <Button
