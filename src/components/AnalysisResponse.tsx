@@ -27,7 +27,6 @@ interface AnalysisResponseProps {
 
 const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
   const [isThinking, setIsThinking] = React.useState(true);
-  const [showImage, setShowImage] = React.useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = React.useState(false);
   const { toast } = useToast();
 
@@ -126,37 +125,39 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
         perfectLetters={analysis.perfectLetters}
       />
 
-      <Card className="p-4 bg-gradient-to-r from-green-50 to-green-100">
-        <h3 className="text-lg font-semibold flex items-center gap-2 text-green-700 mb-3">
-          <Check className="h-5 w-5" />
-          Styrkor
-        </h3>
-        <ul className="space-y-2">
-          {analysis.strengths.map((point, index) => (
-            <li key={index} className="flex items-start gap-2 text-green-800">
-              <span className="mt-1">•</span>
-              {point}
-            </li>
-          ))}
-        </ul>
-      </Card>
-
-      {analysis.improvements.length > 0 && (
-        <Card className="p-4 bg-gradient-to-r from-amber-50 to-amber-100">
-          <h3 className="text-lg font-semibold flex items-center gap-2 text-amber-700 mb-3">
-            <AlertTriangle className="h-5 w-5" />
-            Förbättringsområden
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="p-4 bg-gradient-to-r from-green-50 to-green-100">
+          <h3 className="text-lg font-semibold flex items-center gap-2 text-green-700 mb-3">
+            <Check className="h-5 w-5" />
+            Styrkor
           </h3>
           <ul className="space-y-2">
-            {analysis.improvements.map((point, index) => (
-              <li key={index} className="flex items-start gap-2 text-amber-800">
+            {analysis.strengths.map((point, index) => (
+              <li key={index} className="flex items-start gap-2 text-green-800">
                 <span className="mt-1">•</span>
                 {point}
               </li>
             ))}
           </ul>
         </Card>
-      )}
+
+        {analysis.improvements.length > 0 && (
+          <Card className="p-4 bg-gradient-to-r from-amber-50 to-amber-100">
+            <h3 className="text-lg font-semibold flex items-center gap-2 text-amber-700 mb-3">
+              <AlertTriangle className="h-5 w-5" />
+              Förbättringsområden
+            </h3>
+            <ul className="space-y-2">
+              {analysis.improvements.map((point, index) => (
+                <li key={index} className="flex items-start gap-2 text-amber-800">
+                  <span className="mt-1">•</span>
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </Card>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="p-4 bg-gradient-to-r from-blue-50 to-blue-100">
@@ -174,16 +175,10 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
         </Card>
 
         <Card className="p-4 bg-gradient-to-r from-purple-50 to-purple-100">
-          <div 
-            role="button"
-            className="cursor-pointer w-full"
-            onClick={() => setShowImage(!showImage)}
-          >
-            <h3 className="text-lg font-semibold flex items-center gap-2 text-purple-700 mb-3">
-              <PenTool className="h-5 w-5" />
-              Bokstäver att öva på
-            </h3>
-          </div>
+          <h3 className="text-lg font-semibold flex items-center gap-2 text-purple-700 mb-3">
+            <PenTool className="h-5 w-5" />
+            Bokstäver att öva på
+          </h3>
           <div className="flex flex-wrap mb-3">
             {analysis.practiceLetters.map((letter, index) => (
               <span key={index} className="inline-block px-3 py-1 m-1 text-lg font-medium rounded-full bg-background border-2">
@@ -191,7 +186,7 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
               </span>
             ))}
           </div>
-          {showImage && message.image && (
+          {message.image && (
             <div className="mt-4">
               <img
                 src={message.image}
