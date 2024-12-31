@@ -26,17 +26,8 @@ interface AnalysisResponseProps {
 }
 
 const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
-  const [isThinking, setIsThinking] = React.useState(true);
   const [isGeneratingPDF, setIsGeneratingPDF] = React.useState(false);
   const { toast } = useToast();
-
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsThinking(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleDownloadPDF = async () => {
     try {
@@ -91,7 +82,7 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
     }
   };
 
-  if (isThinking || !message.analysis) {
+  if (!message.analysis) {
     return <AnalysisLoading image={message.image} />;
   }
 
