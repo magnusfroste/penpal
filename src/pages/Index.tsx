@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import Footer from '@/components/Footer';
 import HandwritingHeader from '@/components/HandwritingHeader';
 import UploadButtons from '@/components/UploadButtons';
+import InstallPrompt from '@/components/InstallPrompt';
 
 const Index = () => {
   const [messages, setMessages] = useState<Array<{ role: string; content: string; image?: string; analysis?: any }>>([]);
@@ -178,6 +179,7 @@ const Index = () => {
         </Card>
       </div>
       <Footer />
+      <InstallPrompt />
     </div>
   );
 };
