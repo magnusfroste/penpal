@@ -17,6 +17,7 @@ const Index = () => {
   const [initError, setInitError] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -47,7 +48,9 @@ const Index = () => {
   }, [toast]);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('File upload triggered on iOS');
     const file = event.target.files?.[0];
+    console.log('Selected file:', file?.name, file?.type);
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
@@ -131,6 +134,12 @@ const Index = () => {
   };
 
   const handleCameraClick = () => {
+    if (cameraInputRef.current) {
+      cameraInputRef.current.click();
+    }
+  };
+
+  const handleFileClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
@@ -142,10 +151,19 @@ const Index = () => {
         <Card className="max-w-4xl mx-auto p-3 sm:p-6 bg-white/80 backdrop-blur-sm shadow-lg border border-gray-100 safe-area-inset">
           <HandwritingHeader />
           
+          {/* Separata inputs för kamera och filval - fungerar bättre på iOS */}
           <input
             type="file"
             accept="image/*"
             capture="environment"
+            onChange={handleFileUpload}
+            ref={cameraInputRef}
+            className="hidden"
+          />
+          
+          <input
+            type="file"
+            accept="image/*"
             onChange={handleFileUpload}
             ref={fileInputRef}
             className="hidden"
@@ -155,7 +173,7 @@ const Index = () => {
             isLoading={isLoading}
             isInitializing={isInitializing}
             handleCameraClick={handleCameraClick}
-            handleFileClick={() => fileInputRef.current?.click()}
+            handleFileClick={handleFileClick}
           />
 
           {uploadProgress > 0 && (
