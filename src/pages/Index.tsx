@@ -141,7 +141,6 @@ const Index = () => {
       <div className="flex-grow">
         <Card className="max-w-4xl mx-auto p-3 sm:p-6 bg-white/80 backdrop-blur-sm shadow-lg border border-gray-100 safe-area-inset">
           <HandwritingHeader />
-          <HandwritingHeader />
           
           <input
             type="file"
