@@ -136,9 +136,10 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 p-4 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 p-2 sm:p-4 flex flex-col">
       <div className="flex-grow">
-        <Card className="max-w-4xl mx-auto p-6 bg-white/80 backdrop-blur-sm shadow-lg border border-gray-100">
+        <Card className="max-w-4xl mx-auto p-3 sm:p-6 bg-white/80 backdrop-blur-sm shadow-lg border border-gray-100 safe-area-inset">
+          <HandwritingHeader />
           <HandwritingHeader />
           
           <input

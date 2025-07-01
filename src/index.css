@@ -36,6 +36,26 @@
   }
 }
 
+/* iOS Safe Areas */
+.safe-area-inset {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Touch optimizations for mobile */
+@media (max-width: 768px) {
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  input[type="file"] + * {
+    min-height: 44px;
+  }
+}
+
 .chat-container {
   @apply flex flex-col gap-4 p-4 max-w-3xl mx-auto;
 }
