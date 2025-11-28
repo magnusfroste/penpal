@@ -87,13 +87,13 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
   }
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-4 sm:space-y-6">
       <AnalysisContent analysis={message.analysis} image={message.image} />
       
-      <div className="flex justify-center">
+      <div className="flex justify-center px-2">
         <Button
           onClick={handleDownloadPDF}
-          className="gap-2 bg-gradient-to-r from-primary/90 to-blue-600/90 hover:from-primary hover:to-blue-600 text-white shadow-md transition-all duration-300"
+          className="gap-2 bg-gradient-to-r from-primary/90 to-blue-600/90 hover:from-primary hover:to-blue-600 text-white shadow-md transition-all duration-300 w-full sm:w-auto text-sm sm:text-base"
           size="lg"
           disabled={isGeneratingPDF}
         >
