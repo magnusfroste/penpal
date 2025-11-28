@@ -146,9 +146,9 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 p-2 sm:p-4 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 px-3 py-4 sm:p-6 flex flex-col safe-area-inset">
       <div className="flex-grow">
-        <Card className="max-w-4xl mx-auto p-3 sm:p-6 bg-white/80 backdrop-blur-sm shadow-lg border border-gray-100 safe-area-inset">
+        <Card className="max-w-4xl mx-auto p-4 sm:p-6 bg-card/90 backdrop-blur-sm shadow-lg border border-border/50">
           <HandwritingHeader />
           
           {/* Separata inputs för kamera och filval - fungerar bättre på iOS */}
@@ -177,9 +177,9 @@ const Index = () => {
           />
 
           {uploadProgress > 0 && (
-            <div className="w-full max-w-md mx-auto mb-8">
+            <div className="w-full max-w-md mx-auto mb-6 sm:mb-8 mt-4">
               <Progress value={uploadProgress} className="h-2" />
-              <p className="text-sm text-muted-foreground mt-2">
+              <p className="text-xs sm:text-sm text-muted-foreground mt-2 text-center">
                 {uploadProgress < 100 ? 'Analyserar din handstil...' : 'Analys klar!'}
               </p>
             </div>
