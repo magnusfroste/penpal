@@ -11,11 +11,11 @@ const HandwritingHeader = () => {
       </div>
       
       <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-foreground mb-3 sm:mb-4 px-4">
-        Förbättra din handstil med AI ✨
+        Din handstils superhjälte! 🦸‍♂️✨
       </h2>
       
       <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-md mx-auto px-4 leading-relaxed">
-        Ta ett foto av din handstil och få personlig feedback och övningar anpassade just för dig
+        Fota din handstil och upptäck magiska tips som gör ditt skrivande ännu vackrare
       </p>
     </div>
   );
