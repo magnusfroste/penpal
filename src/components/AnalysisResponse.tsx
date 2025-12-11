@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Download, Loader2 } from "lucide-react";
+import { Download, Loader2, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { createRoot } from 'react-dom/client';
 import jsPDF from 'jspdf';
@@ -8,6 +8,7 @@ import html2canvas from 'html2canvas';
 import HandwritingExerciseSheet from './HandwritingExerciseSheet';
 import AnalysisLoading from './analysis/AnalysisLoading';
 import AnalysisContent from './analysis/AnalysisContent';
+import ExerciseSheetPreview from './ExerciseSheetPreview';
 
 interface Analysis {
   strengths: string[];
@@ -27,6 +28,7 @@ interface AnalysisResponseProps {
 
 const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
   const [isGeneratingPDF, setIsGeneratingPDF] = React.useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = React.useState(false);
   const { toast } = useToast();
 
   const handleDownloadPDF = async () => {
@@ -70,6 +72,8 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
         title: "PDF skapad!",
         description: "Din övning har laddats ner som PDF.",
       });
+      
+      setIsPreviewOpen(false);
     } catch (error) {
       console.error('Error generating PDF:', error);
       toast({
@@ -92,19 +96,24 @@ const AnalysisResponse = ({ message }: AnalysisResponseProps) => {
       
       <div className="flex justify-center px-2">
         <Button
-          onClick={handleDownloadPDF}
+          onClick={() => setIsPreviewOpen(true)}
           className="gap-2 bg-gradient-to-r from-primary/90 to-blue-600/90 hover:from-primary hover:to-blue-600 text-white shadow-md transition-all duration-300 w-full sm:w-auto text-sm sm:text-base"
           size="lg"
-          disabled={isGeneratingPDF}
         >
-          {isGeneratingPDF ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Download className="h-4 w-4" />
-          )}
-          {isGeneratingPDF ? 'Skapar PDF...' : 'Ladda ner övningsblad'}
+          <Eye className="h-4 w-4" />
+          Förhandsvisa övningsblad
         </Button>
       </div>
+
+      <ExerciseSheetPreview
+        open={isPreviewOpen}
+        onOpenChange={setIsPreviewOpen}
+        practiceLetters={message.analysis.practiceLetters}
+        improvements={message.analysis.improvements}
+        tips={message.analysis.tips}
+        onDownload={handleDownloadPDF}
+        isDownloading={isGeneratingPDF}
+      />
     </div>
   );
 };
