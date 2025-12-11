@@ -10,31 +10,33 @@ interface UploadButtonsProps {
 
 const UploadButtons = ({ isLoading, isInitializing, handleCameraClick, handleFileClick }: UploadButtonsProps) => {
   return (
-    <div className="space-y-4 sm:space-y-6 text-center">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-w-md mx-auto">
+    <div className="py-6 sm:py-8">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 max-w-sm sm:max-w-md mx-auto">
         <Button
           onClick={handleCameraClick}
           disabled={isLoading || isInitializing}
-          className="h-16 sm:h-20 text-base sm:text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+          size="lg"
+          className="h-20 sm:h-24 text-sm sm:text-base font-semibold bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-700 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col gap-1 sm:gap-2"
         >
           {isInitializing ? (
-            <Loader2 className="mr-2 h-6 w-6 sm:h-8 sm:w-8 animate-spin" />
+            <Loader2 className="h-7 w-7 sm:h-8 sm:w-8 animate-spin" />
           ) : isLoading ? (
-            <Loader2 className="mr-2 h-6 w-6 sm:h-8 sm:w-8 animate-spin" />
+            <Loader2 className="h-7 w-7 sm:h-8 sm:w-8 animate-spin" />
           ) : (
-            <Camera className="mr-2 h-6 w-6 sm:h-8 sm:w-8" />
+            <Camera className="h-7 w-7 sm:h-8 sm:w-8" />
           )}
-          {isInitializing ? 'Initierar...' : 'Ta foto'}
+          <span>{isInitializing ? 'Initierar...' : 'Ta foto'}</span>
         </Button>
         
         <Button
           onClick={handleFileClick}
           disabled={isLoading || isInitializing}
           variant="outline"
-          className="h-16 sm:h-20 text-base sm:text-lg font-semibold border-2 border-blue-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-300"
+          size="lg"
+          className="h-20 sm:h-24 text-sm sm:text-base font-semibold border-2 border-primary/20 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300 flex flex-col gap-1 sm:gap-2"
         >
-          <Upload className="mr-2 h-6 w-6 sm:h-8 sm:w-8" />
-          Ladda upp
+          <Upload className="h-7 w-7 sm:h-8 sm:w-8" />
+          <span>Ladda upp</span>
         </Button>
       </div>
     </div>

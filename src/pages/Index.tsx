@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import Footer from '@/components/Footer';
 import HandwritingHeader from '@/components/HandwritingHeader';
 import UploadButtons from '@/components/UploadButtons';
+import HowItWorks from '@/components/HowItWorks';
 import InstallPrompt from '@/components/InstallPrompt';
 
 const Index = () => {
@@ -145,56 +146,75 @@ const Index = () => {
     }
   };
 
+  const hasMessages = messages.length > 0;
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 px-3 py-4 sm:p-6 flex flex-col safe-area-inset">
-      <div className="flex-grow">
-        <Card className="max-w-4xl mx-auto p-4 sm:p-6 bg-card/90 backdrop-blur-sm shadow-lg border border-border/50">
+    <div className="min-h-screen bg-gradient-to-b from-background via-primary/5 to-muted/30 px-4 py-6 sm:px-6 sm:py-8 flex flex-col safe-area-inset">
+      <div className="flex-grow flex flex-col">
+        <div className="max-w-2xl mx-auto w-full">
+          {/* Hero Section */}
           <HandwritingHeader />
           
-          {/* Separata inputs för kamera och filval - fungerar bättre på iOS */}
-          <input
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={handleFileUpload}
-            ref={cameraInputRef}
-            className="hidden"
-          />
-          
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            ref={fileInputRef}
-            className="hidden"
-          />
-          
-          <UploadButtons
-            isLoading={isLoading}
-            isInitializing={isInitializing}
-            handleCameraClick={handleCameraClick}
-            handleFileClick={handleFileClick}
-          />
-
-          {uploadProgress > 0 && (
-            <div className="w-full max-w-md mx-auto mb-6 sm:mb-8 mt-4">
-              <Progress value={uploadProgress} className="h-2" />
-              <p className="text-xs sm:text-sm text-muted-foreground mt-2 text-center">
-                {uploadProgress < 100 ? 'Analyserar din handstil...' : 'Analys klar!'}
-              </p>
-            </div>
+          {/* How It Works - only show when no messages */}
+          {!hasMessages && (
+            <Card className="bg-card/60 backdrop-blur-sm border border-border/30 shadow-sm mb-6 sm:mb-8">
+              <HowItWorks />
+            </Card>
           )}
+          
+          {/* Upload Section */}
+          <Card className="bg-card/80 backdrop-blur-sm border border-border/50 shadow-lg p-4 sm:p-6">
+            {/* Hidden inputs */}
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handleFileUpload}
+              ref={cameraInputRef}
+              className="hidden"
+            />
+            
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileUpload}
+              ref={fileInputRef}
+              className="hidden"
+            />
+            
+            <UploadButtons
+              isLoading={isLoading}
+              isInitializing={isInitializing}
+              handleCameraClick={handleCameraClick}
+              handleFileClick={handleFileClick}
+            />
 
-          {initError && (
-            <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-lg border border-red-100">
-              <p className="font-semibold">Ett fel uppstod vid initiering:</p>
-              <p className="text-sm">{initError}</p>
-            </div>
+            {uploadProgress > 0 && (
+              <div className="w-full max-w-sm mx-auto mb-4 px-2">
+                <Progress value={uploadProgress} className="h-2" />
+                <p className="text-xs sm:text-sm text-muted-foreground mt-2 text-center">
+                  {uploadProgress < 100 ? 'Analyserar din handstil...' : 'Analys klar!'}
+                </p>
+              </div>
+            )}
+
+            {initError && (
+              <div className="mt-4 p-4 bg-destructive/10 text-destructive rounded-lg border border-destructive/20">
+                <p className="font-semibold">Ett fel uppstod vid initiering:</p>
+                <p className="text-sm">{initError}</p>
+              </div>
+            )}
+          </Card>
+
+          {/* Chat/Results Section */}
+          {hasMessages && (
+            <Card className="mt-6 sm:mt-8 bg-card/80 backdrop-blur-sm border border-border/50 shadow-lg p-4 sm:p-6">
+              <ChatInterface messages={messages} />
+            </Card>
           )}
-
-          <ChatInterface messages={messages} />
-        </Card>
+        </div>
       </div>
+      
       <Footer />
       <InstallPrompt />
     </div>
