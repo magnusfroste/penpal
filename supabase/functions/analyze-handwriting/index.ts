@@ -154,7 +154,8 @@ Svara ENDAST med JSON, inga extra kommentarer.`
     }
   } catch (error) {
     console.error('Error in analyze-handwriting function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    const errorMessage = error instanceof Error ? error.message : 'Ett okänt fel uppstod';
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
