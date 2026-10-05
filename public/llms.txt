@@ -1,0 +1,11 @@
+# Penpal Buddy
+
+> AI-driven handstilsanalys för barn – fotografera, få feedback och öva.
+
+Penpal Buddy låter barn och föräldrar fotografera en handskriven text. AI analyserar bokstavsformer och mellanrum, ger personlig och uppmuntrande feedback och skapar övningsblad som kan laddas ner som PDF för att träna vidare.
+
+Appen är gjord för barn som tränar handstil och för föräldrar och lärare som vill stötta dem. Den kan installeras som app (PWA) i mobilen.
+
+## Länkar
+
+- [Penpal Buddy](https://penpal-buddy.lovable.app/): Starta analysen direkt i webbläsaren.
