@@ -1,6 +1,7 @@
 // PenPal – the page. One small single-page app: a hash router, the frame around every screen
 // (logo, navigation) and the shared state. The screens are in js/views.js, the practice sheet in
-// js/sheet.js. No framework, no build step, no inline script, and nothing from other hosts.
+// js/sheet.js. No framework, no build step, no inline script, and nothing from other hosts but
+// skolappar's anonymous usage snippet (kotten.js, see views.js).
 
 import { h, icon, art, toast } from './js/ui.js';
 import { api } from './js/api.js';
