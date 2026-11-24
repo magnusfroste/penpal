@@ -110,11 +110,15 @@ async function demoMode() {
     const page = await fetch(`${base}/`);
     const html = await page.text();
     check('GET / serves the page', page.status === 200 && html.includes('id="app"'));
-    check('CSP allows scripts from this site only', /script-src 'self'/.test(page.headers.get('content-security-policy') || ''));
+    const csp = page.headers.get('content-security-policy') || '';
+    check("CSP allows scripts from this site and skolappar's snippet only", /script-src 'self' https:\/\/www\.skolappar\.com;/.test(csp));
+    check('CSP allows connections to this site and skolappar.com only', /connect-src 'self' https:\/\/www\.skolappar\.com;/.test(csp));
+    const snippet = '<script src="https://www.skolappar.com/kotten.js" defer></script>';
+    check("the page loads skolappar's usage snippet", html.includes(snippet));
     const scripts = html.match(/<script\b[^>]*>/g) || [];
-    check('no inline script in the page', scripts.length > 0 && scripts.every((s) => /\bsrc="\/[^"]+"/.test(s)), scripts);
+    check('no inline script in the page', scripts.length > 0 && scripts.every((s) => /\bsrc="(?:\/[^"]+|https:\/\/www\.skolappar\.com\/kotten\.js)"/.test(s)), scripts);
     check('no inline event handlers in the page', !/<[^>]+\son[a-z]+\s*=/i.test(html));
-    check('nothing is loaded from another site', !/(?:src|href)\s*=\s*["'](?:https?:)?\/\//i.test(html));
+    check("nothing is loaded from another site but skolappar's snippet", !/(?:src|href)\s*=\s*["'](?:https?:)?\/\//i.test(html.replace(snippet, '')));
     for (const f of ['/app.js', '/style.css']) check(`GET ${f}`, (await fetch(base + f)).status === 200);
 
     const anna = client(base);

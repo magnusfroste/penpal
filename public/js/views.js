@@ -125,6 +125,9 @@ export async function homeView(ctx) {
 
 // ---------------------------------------------------------------- scan
 
+// skolappar's usage snippet (kotten.js): anonymous counts only, never text, names or ids.
+const report = (name, value) => { try { window.skolappar?.event(name, value); } catch (e) { /* the app works without it */ } };
+
 export function scanView(ctx) {
   const root = h('div', { class: 'view view-scan' });
 
@@ -161,11 +164,14 @@ export function scanView(ctx) {
       h('div', { class: 'scan-photo' }, photo, h('i', { class: 'scan-beam' })),
       h('h1', { role: 'status' }, 'Jag tittar på dina bokstäver …'),
       h('p', { class: 'lead' }, 'Det tar en liten stund.')));
+    report('round_start');
     try {
       const { image, thumb } = await preparePhoto(file);
       photo.src = image;
       const data = await api('/api/scans', { image, thumb });
-      if (data.retake) { pick(data.retake.message); return; }
+      if (data.retake) { report('hint'); pick(data.retake.message); return; }
+      report('round_done', data.scan.score);
+      if (data.earned && data.earned.level_up) report('level', data.earned.level_up.n);
       ctx.state.game = data.game;
       ctx.state.fresh = { id: data.scan.id, earned: data.earned };
       if (root.isConnected) ctx.go(`/resultat/${data.scan.id}`);
